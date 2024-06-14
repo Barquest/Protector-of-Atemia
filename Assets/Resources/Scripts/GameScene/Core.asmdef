@@ -1,0 +1,22 @@
+{
+    "name": "Core",
+    "rootNamespace": "MadGeekStudio.ProtectorOfAtemia.Core",
+    "references": [
+        "GUID:99b85b503518fa443b8d18087c543b68",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:f11d63c4811f510448c23763a0bf52b4",
+        "GUID:84a19fd8a17943046afba34170c7ae27",
+        "GUID:050935a19ae22b14fabe7d497cc7fdf5",
+        "GUID:eec0964c48f6f4e40bc3ec2257ccf8c5",
+        "GUID:dc9744016a5788b4e913ed7af33d11d0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
