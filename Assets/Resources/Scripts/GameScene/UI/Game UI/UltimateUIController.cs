@@ -13,6 +13,9 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         [SerializeField] private Color defaultColor;
         [SerializeField] private Color maxColor;
         [SerializeField] private Button useSkillButton;
+        [SerializeField] private TextMeshProUGUI useSkillText;
+        bool available;
+        bool isActivated;
 
 		public event Action OnSkillButtonPressed;
 
@@ -28,6 +31,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
             {
                 sliderFill.color = maxColor;
                 useSkillButton.gameObject.SetActive(true);
+                available = true;
             }
             else {
                 sliderFill.color = defaultColor;
@@ -39,8 +43,25 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		}
 		public void SkillButtonPressed()
         {
+            if (!isActivated) return;
+            
             OnSkillButtonPressed?.Invoke();
+            available = false;
             useSkillButton.gameObject.SetActive(false);
+        }
+        public void DisactivateSkillButton()
+        {
+           // if (!available) return;
+            useSkillButton.image.color = Color.grey;
+            useSkillText.color = Color.grey;
+            isActivated = false;
+        }
+        public void ActivateSkillButton()
+        {
+           // if (!available) return;
+            useSkillButton.image.color = Color.white;
+            useSkillText.color = Color.white;
+            isActivated = true;
         }
     }
 }

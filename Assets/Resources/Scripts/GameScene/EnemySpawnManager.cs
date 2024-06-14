@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MadGeekStudio.ProtectorOfAtemia.Systems.Audio;
 
 using Random = UnityEngine.Random;
 
@@ -106,6 +107,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 				ParticleScript particle = ObjectPoolController.Instance.particlePool.GetObject();
 				particle.transform.position = enemyInScene[i].transform.position;
 				enemyInScene[i].Ultimated();
+				AudioManager.Instance.PlaySfx("Sword Hit");
 				yield return new WaitForSeconds(0.1f);
 			}
 			enemyInScene.Clear();

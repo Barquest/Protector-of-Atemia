@@ -182,12 +182,15 @@ MonoBehaviour:
     soundName: 1
     clip: {fileID: 8300000, guid: 36ab0d1c88c5e9f41899facd8a8e78d1, type: 3}
   sfxSounds:
-  - name: Click
+  - name: Shield Hit
     soundName: 0
-    clip: {fileID: 8300000, guid: f8536beab8a77c34595022ebe95f5dd8, type: 3}
-  - name: Popup
+    clip: {fileID: 8300000, guid: fc52a58ca8c60b24ca73905e62300031, type: 3}
+  - name: Sword Whoosh
     soundName: 0
-    clip: {fileID: 8300000, guid: 93b06235bf55c6b45b79863b8527e196, type: 3}
+    clip: {fileID: 8300000, guid: 716eccf3b567aa244aa173a5cc1f613d, type: 3}
+  - name: Sword Hit
+    soundName: 0
+    clip: {fileID: 8300000, guid: d5b1db0d9a0c37648a15f351b56b8f82, type: 3}
   musicSource: {fileID: 7148420041099022204}
   sfxSource: {fileID: 329072330272650594}
 --- !u!1 &7714818425301824904

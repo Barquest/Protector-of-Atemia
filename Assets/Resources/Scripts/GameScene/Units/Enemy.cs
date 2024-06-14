@@ -134,10 +134,12 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         {
             this.place = place;
         }
+        bool pausingLeanTween;
 		public virtual void Pause()
 		{
             isPaused = true;
             LeanTween.pause(gameObject);
+            pausingLeanTween = true;
         }
         public virtual void GameOver()
         {
@@ -150,8 +152,10 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		public virtual void Continue()
 		{
             isPaused = false;
-            if (LeanTween.tweensRunning > 0)
+            
+            if (pausingLeanTween)
             {
+                pausingLeanTween = false;
                 LeanTween.resume(gameObject);
             }
         }

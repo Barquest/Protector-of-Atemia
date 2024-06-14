@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using MadGeekStudio.ProtectorOfAtemia.Systems.Audio;
 
 namespace MadGeekStudio.ProtectorOfAtemia.Core
 {
@@ -32,6 +33,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 				Parry();
 				NotifyObservers(Act.Attack);
 				OnAttackSuccess?.Invoke();
+				AudioManager.Instance.PlaySfx("Shield Hit");
 			}
 		}
 		private void Parry()

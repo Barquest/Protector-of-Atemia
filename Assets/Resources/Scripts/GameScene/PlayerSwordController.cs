@@ -2,6 +2,7 @@ using UnityEngine;
 using DentedPixel;
 using System;
 using System.Collections;
+using MadGeekStudio.ProtectorOfAtemia.Systems.Audio;
 
 namespace MadGeekStudio.ProtectorOfAtemia.Core
 {
@@ -23,6 +24,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         private readonly float backDelay = 0.25f;
 
 		public event Action OnBackToPosition;
+        public event Action OnStartAttacking;
 		public event Action OnAttackSuccess;
 
 		private void Start()
@@ -38,7 +40,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
                 isAttacking = true;
                 isDoneAttacking = false;
                 anim.SetBool("Attacking",true);
-                
+                OnStartAttacking?.Invoke();
             }
         }
         public void Skill()
@@ -102,6 +104,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
             anim.ResetTrigger("Right");
             anim.ResetTrigger("Left");
             anim.SetBool("Back", true);
+            AudioManager.Instance.PlaySfx("Sword Whoosh");
             ParticleScript particle = ObjectPoolController.Instance.particlePool.GetObject();
             particle.transform.position = transform.position;
             StartCoroutine(BackDelay());
@@ -120,6 +123,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
             {
                 if (isAttacking)
                 {
+                    AudioManager.Instance.PlaySfx("Sword Hit");
                     OnAttackSuccess?.Invoke();
                     DoneAttacking();
                     collision.gameObject.GetComponent<Enemy>().Damaged();
@@ -131,6 +135,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		{
             OnAttackSuccess = null;
             OnBackToPosition = null;
+            OnStartAttacking = null;
 		}
 	}
 

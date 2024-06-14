@@ -609,7 +609,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -63.42993, y: -57.369995}
+  m_AnchoredPosition: {x: -63.42993, y: -57.370117}
   m_SizeDelta: {x: 126.859985, y: 109.51001}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &33228193
@@ -9290,6 +9290,63 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 279055898}
   m_Mesh: {fileID: -3483112915789174751, guid: 8f9d76105471ae3499b4a9fcae5e0135, type: 3}
+--- !u!1001 &284069916
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4916582078729953155, guid: d715f26755c26d44696dc0c1cc7d4482, type: 3}
+      propertyPath: m_Name
+      value: Audio Manager
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437765923413343226, guid: d715f26755c26d44696dc0c1cc7d4482, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.219912
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437765923413343226, guid: d715f26755c26d44696dc0c1cc7d4482, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.6666217
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437765923413343226, guid: d715f26755c26d44696dc0c1cc7d4482, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -9.659615
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437765923413343226, guid: d715f26755c26d44696dc0c1cc7d4482, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437765923413343226, guid: d715f26755c26d44696dc0c1cc7d4482, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437765923413343226, guid: d715f26755c26d44696dc0c1cc7d4482, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437765923413343226, guid: d715f26755c26d44696dc0c1cc7d4482, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437765923413343226, guid: d715f26755c26d44696dc0c1cc7d4482, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437765923413343226, guid: d715f26755c26d44696dc0c1cc7d4482, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437765923413343226, guid: d715f26755c26d44696dc0c1cc7d4482, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d715f26755c26d44696dc0c1cc7d4482, type: 3}
 --- !u!1 &286849681
 GameObject:
   m_ObjectHideFlags: 0
@@ -15641,6 +15698,7 @@ MonoBehaviour:
   defaultColor: {r: 0.93411165, g: 0.9924528, b: 0.20785333, a: 1}
   maxColor: {r: 1, g: 0.21520592, b: 0, a: 1}
   useSkillButton: {fileID: 305080334}
+  useSkillText: {fileID: 251959989}
 --- !u!1 &897623947
 GameObject:
   m_ObjectHideFlags: 0
@@ -24233,7 +24291,6 @@ MonoBehaviour:
   iconDisplay: {fileID: 1619654376}
   dialogueText: {fileID: 1915804776}
   nameText: {fileID: 1384793035}
-  icon: {fileID: 57433210}
   currentDialogueGroup: {fileID: 0}
   index: 0
 --- !u!114 &1619654375
@@ -24891,7 +24948,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1661456779}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
   m_Camera: {fileID: 0}
@@ -36691,6 +36748,7 @@ SceneRoots:
   - {fileID: 2136950225}
   - {fileID: 1393060013}
   - {fileID: 501712872}
+  - {fileID: 284069916}
   - {fileID: 1661456783}
   - {fileID: 1057340681}
   - {fileID: 16502005}

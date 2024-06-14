@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections;
+using MadGeekStudio.ProtectorOfAtemia.Systems.Audio;
 using System.Collections.Generic;
 
 namespace MadGeekStudio.ProtectorOfAtemia.Core
@@ -60,7 +61,10 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			playerController.SetShieldAction(AddUltimatePoint);
 			playerController.SetSwordAction(AddUltimatePoint);
 			playerController.SetCanMove(false);
+			playerSwordController.OnStartAttacking += ultimateUIController.DisactivateSkillButton;
+			playerSwordController.OnBackToPosition += ultimateUIController.ActivateSkillButton;
 			dialogueManager.AfterDialogueComplete += AfterDialogueComplete;
+			AudioManager.Instance.StopMusic();
 			//laneHelperController.StartDecaying();
 			dialogueManager.Hide();
 			StartCoroutine(StartDelay());
@@ -68,6 +72,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		}
 		private IEnumerator StartDelay()
 		{
+			uiManager.Hide();
 			yield return new WaitForSeconds(2);
 			dialogueManager.ShowDialogueGroup(0);
 		}
@@ -82,6 +87,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		public void AfterDialogueComplete()
 		{
 			enemySpawnManager.StartSpawnManager();
+			AudioManager.Instance.PlayMusic("Battle Music");
 			playerController.SetCanMove(true);
 			laneHelperController.StartDecaying();
 		}
@@ -102,6 +108,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			//LeanTween.resumeAll();
 
 		}
+		
 		public void AddKillCount(int value)
 		{
 			StageGameData.AddKillCount(value);
@@ -123,7 +130,6 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		private void UltimateAttack()
 		{
 			StartCoroutine(StartUltimateAttack());
-		
 		}
 		private IEnumerator StartUltimateAttack()
 		{

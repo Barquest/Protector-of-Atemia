@@ -52,7 +52,6 @@ namespace MadGeekStudio.ProtectorOfAtemia.Systems.Audio
 			musicSource.Stop();
 		}
 
-
 		public void PlayMusic(SoundName name)
 		{
 			Sound s = Array.Find(musicSounds, sound => sound.soundName == name);
