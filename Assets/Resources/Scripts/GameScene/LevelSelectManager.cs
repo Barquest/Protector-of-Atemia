@@ -11,6 +11,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		[SerializeField] private List<LevelSelectData> levelData;
 		[SerializeField] private LevelSelectUI levelSelectUI;
 		[SerializeField] private LevelSelectCharacter levelSelectCharacter;
+		[SerializeField] private MainMenuManager menuManager;
 
 		[SerializeField] private Dictionary<string, LevelSelectButton> levelDictionaries = new Dictionary<string, LevelSelectButton>();
 		[SerializeField] private bool isWalking;
@@ -124,6 +125,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			//lastLevelSelected = levelSelected;
 			levelSelected = data;
 			currentIndex = data.GetIndex();
+			menuManager.Hide();
 		}
 		public void PlayLevel()
 		{
@@ -140,6 +142,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		public void Hide()
 		{
 			levelSelectUI.Hide();
+			menuManager.Show();
 		}
 		private void CheckLevelAvailable()
 		{

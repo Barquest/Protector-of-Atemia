@@ -603,7 +603,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &204150726
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7032,7 +7032,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1195243249}
-  offset: {x: 0, y: 12, z: -10}
+  offset: {x: 0, y: 12, z: -12}
 --- !u!4 &568447857 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 54ae05d9901b9804c8e020492ee335af, type: 3}
@@ -18851,7 +18851,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.38
+      value: -2.03
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalPosition.y
@@ -18859,7 +18859,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 13.58
+      value: 28.25
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -21605,7 +21605,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.49
+      value: -0.11
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalPosition.y
@@ -21613,7 +21613,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.78
+      value: 9.36
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -27128,7 +27128,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.57
+      value: 1.84
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalPosition.y
@@ -27136,7 +27136,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 9.58
+      value: 21.96
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -38557,7 +38557,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.92
+      value: -4.08
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalPosition.y
@@ -38565,7 +38565,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.33
+      value: 16.4
       objectReference: {fileID: 0}
     - target: {fileID: 7029940021286359864, guid: 902e9ddd573b5734596d574183e7adb3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -38829,7 +38829,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2089435556}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 563366bd2a5b3444e86271760400e6cc, type: 3}
   m_Name: 
