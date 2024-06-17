@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - Shield
+  - Level Select
   layers:
   - Default
   - TransparentFX

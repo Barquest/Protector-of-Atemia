@@ -26,7 +26,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			SetupLevelList();
 			CheckLevelAvailable();
 			currentIndex = 0;
-			DisplayLevel(levelList[0]);
+			//DisplayLevel(levelList[0]);
 		}
 		private void SetupLevelList()
 		{
@@ -53,6 +53,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		}
 		public void DisplayLevel(LevelSelectButton data)
 		{
+			/*
 			if (!isWalking)
 			{
 				if (levelSelected == data)
@@ -107,7 +108,22 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 				lastLevelSelected = levelSelected;
 				levelSelected = data;
 				currentIndex = data.GetIndex();
+			}*/
+			Debug.Log("DisplayData");
+			if (data.isLocked)
+			{
+				Debug.Log("Data is Locked");
+				levelSelectUI.DisplayData(data.GetLevelData());
+				levelSelectUI.DisplayLocked();
 			}
+			else
+			{
+				Debug.Log("Data is Unlocked");
+				levelSelectUI.DisplayData(data.GetLevelData());
+			}
+			//lastLevelSelected = levelSelected;
+			levelSelected = data;
+			currentIndex = data.GetIndex();
 		}
 		public void PlayLevel()
 		{
@@ -120,6 +136,10 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 				GlobalGameManager.Instance.SetLevelData(levelSelected.GetLevelData());
 				MainMenuManager.Instance.LoadLevel(3);
 			}
+		}
+		public void Hide()
+		{
+			levelSelectUI.Hide();
 		}
 		private void CheckLevelAvailable()
 		{
