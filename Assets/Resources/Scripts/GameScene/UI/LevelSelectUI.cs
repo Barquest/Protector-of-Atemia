@@ -17,6 +17,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 
         public void DisplayData(LevelSelectData data)
         {
+            Show();
             locked.SetActive(false);
             levelSelected = data;
             levelName.text = data.levelName;
