@@ -11,13 +11,18 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         [SerializeField] private GameObject loadingScreen;
         [SerializeField] private Image loadingBarFill;
 
-        public void LoadScene(int sceneId)
+        LoadingScreenTips loadingScreenTips;
+		private void Start()
+		{
+            loadingScreenTips = GetComponent<LoadingScreenTips>();
+		}
+		public void LoadScene(int sceneId)
         {
-            
             StartCoroutine(LoadSceneAsync(sceneId));
         }
         public void LoadScene(string sceneName)
         {
+            loadingScreenTips.DisplayRandomTips();
             int sceneId = SceneManager.GetSceneByName(sceneName).buildIndex;
             if (sceneId >= 0)
             {
@@ -32,7 +37,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 
         IEnumerator LoadSceneAsync(int sceneId)
         {
-            
+            loadingScreenTips.DisplayRandomTips();
             AsyncOperation operation = SceneManager.LoadSceneAsync(sceneId);
             loadingScreen.SetActive(true);
             while (!operation.isDone)

@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f4e2604ce3fdba4aac205737834bef9, type: 3}
+  m_Name: TipsDataIndonesia
+  m_EditorClassIdentifier: 
+  tipsList:
+  - "Antarnusa adalah dunia yang sedang kalian jelajahi, terdiri dari 6\tBenua dan
+    11 Negara besar. Willowdale adalah salah satu kota di negara Westerian, di negara
+    ini suatu kota dipimpin oleh seorang Baron. "
+  - 'The Cardinal Command adalah tentara elite yang memiliki skill diatas rata-rata
+    tentara biasa, mereka tidak memiliki tuan, hidup berdasarkan sewaan para politisi,
+    pemimpin negara, bahkan suatu pasukan. Berbeda dengan para petualang, mereka
+    memiliki kode etik, markas rahasia, sistem pangkat dan kehormatan.
+
+'
+  - Swipe-swipe sebelum beraksi agar tanganmu nyaman dan rileks, jangan dipaksakan
+    jika kamu sudah kelelahan dan terlalu lama bermain ya!
+  - Batu Atemia / Batu Kehidupan / Batu Keabadian / Batu Suci dan masih banyak lagi
+    sebutan bagi batu ajaib yang satu ini, leburkan makan suatu mesin tidak akan
+    pernah mati, leburkan maka senjatamu akan diselimuti kekuatan yang dahsyat, leburkan
+    konon katanya bisa menghidupkan sesuatu yang mati.
+  - Combat itu sangat berbahaya dan bisa sangat menyakitkan, jadi perhatikan HP-mu
+    sebelum bertarung, konsumsi makanan bergizi minum air untuk hilangkan dehidrasi
+    dan jangan ragukan kekuatan dari rekanmu!
+  - Uang tidak akan dibawa mati maka pergunakanlah sebaik dan sebijak mungkin untuk
+    mengupgrade peralatanmu dan rekan-rekanmu, atau mungkin kamu memang suka menabung
+    untuk hal lain?!
+  - Sebelum kombat terjadi alangkah baiknya kalian persiapkan pasukan sekutu dan
+    persiapkan item yang akan dipakai, karena tidak akan ada waktu bagi kalian untuk
+    mengorek tas persediaan saat kombat bukan!
+  - "Kenapa Torvin tidak punya tangan?!\r\nHmm, karena tidak semua mc harus sempurna
+    hahaha, candaan macam apa itu! \r\nBaiklah jawabannya adalah, Torvin tertebas
+    saat perang Red Rose pada tahun 1372 saat itu dia berusia 24 tahun membela Willowdale,
+    dan ya dia kehilangan tangannya, kabarnya Torvin akan ke Buitenzorg untuk membuat
+    tangan protestik disana."
+  - Arona adalah tangan kanan dari Torvin, mereka bagaikan Adik kakak yang solid,
+    tetapi tidak ada hubungan darah di antara keduanya. ya begitulah kalian akan
+    mengenal mereka seiring berjalannya waktu.
+  - 'Energi sihir merupakan bakat sekaligus kutukan bagi seseorang di Antarnusa,
+    semua pengguna sihir memiliki kecerdasan lebih, detak jantung tinggi, aliran
+    darah cepat dan semua indera lebih peka, makannya para pengguna sihir cenderung
+    memiliki umur yang lebih pendek, jadi jika kalian ingin jadi penyihir siapkah
+    kalian dengan mati lebih muda?!
+
+    [EXT] paling tua di umur 55 sampai 60.
+    hanya para penyihir di masa tua ada yang bertahan hidup sampai 100 tahunan lebih.
+    tapi kawan saat itupun tentara bisa hidup sampai 150 sampai 160 tahunan.'
+  - Goblin memiliki sistem reproduksi yang sangat cepat seperti kucing, sekali lahir
+    bisa sampai 4/8 bayi, maka wajar populasi mereka banyak, dan sering sekali mengganggu
+    ras lain.
