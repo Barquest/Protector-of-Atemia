@@ -10,9 +10,11 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		[SerializeField] private ParticleSystem particle;
 		private void OnEnable()
 		{
-			particle.Play();
+			if (particle != null)
+			{
+				particle?.Play();
+			}
 			StartCoroutine(DisableDelay());
-
 		}
 		private IEnumerator DisableDelay()
 		{

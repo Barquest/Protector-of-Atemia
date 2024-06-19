@@ -99,6 +99,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         
         private void DoneAttacking()
         {
+            Debug.Log("Done Attacking");
             isAttacking = false;
             anim.SetBool("Attacking", false);
             anim.ResetTrigger("Right");
@@ -123,11 +124,17 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
             {
                 if (isAttacking)
                 {
-                    AudioManager.Instance.PlaySfx("Sword Hit");
-                    OnAttackSuccess?.Invoke();
-                    DoneAttacking();
-                    collision.gameObject.GetComponent<Enemy>().Damaged();
-                    NotifyObservers(Act.Attack);
+                    Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+                    if (!enemy.GetIsDead())
+                    {
+                        AudioManager.Instance.PlaySfx("Sword Hit");
+                        OnAttackSuccess?.Invoke();
+                        DoneAttacking();
+                        ParticleScript blood = ObjectPoolController.Instance.bloodPool.GetObject();
+                        blood.transform.position = transform.position;
+                        NotifyObservers(Act.Attack);
+                        collision.gameObject.GetComponent<Enemy>().Damaged();
+                    }
                 }
             }
 		}

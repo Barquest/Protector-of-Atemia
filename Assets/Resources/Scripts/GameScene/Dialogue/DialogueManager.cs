@@ -40,6 +40,10 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
             canvas.enabled = true;
             GameManager.Instance.HideGameUI();
         }
+        public void Skip()
+        {
+            EndOfDialogueGroup();
+        }
         public void ShowDialogue(DialogueData data)
         {
             //dialogueText.text = data.dialogueText;

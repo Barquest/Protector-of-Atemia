@@ -73,7 +73,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		private IEnumerator StartDelay()
 		{
 			uiManager.Hide();
-			yield return new WaitForSeconds(2);
+			yield return new WaitForSeconds(0.5f);
 			dialogueManager.ShowDialogueGroup(0);
 		}
 		public void ShowGameUI()

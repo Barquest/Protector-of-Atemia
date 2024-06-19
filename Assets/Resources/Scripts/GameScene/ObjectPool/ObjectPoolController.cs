@@ -11,6 +11,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         public GoblinPool goblinPool;
         public ParticlePool particlePool;
         public ParticlePool redImpactPool;
+        public ParticlePool bloodPool;
         void Awake()
         {
             Instance = this;

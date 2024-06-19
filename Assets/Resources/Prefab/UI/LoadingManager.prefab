@@ -286,7 +286,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7042070714413973342
 RectTransform:
   m_ObjectHideFlags: 0
@@ -584,5 +584,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tipsData: {fileID: 11400000, guid: 891795013fbd13844a150f10a479e30c, type: 2}
-  tipsList: []
   tipsText: {fileID: 7141344212843689529}

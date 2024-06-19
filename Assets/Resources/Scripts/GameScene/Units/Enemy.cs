@@ -20,6 +20,8 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         [SerializeField] protected bool isDashing;
         [SerializeField] protected bool isGameOver;
         [SerializeField] protected bool isDead;
+
+        [SerializeField] protected Animator anim;
         // private EnemySpawnManager enemySpawnManager;
         public bool firstSpawned { get; private set; }
 
@@ -53,30 +55,41 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		}
 		public virtual void Damaged()
         {
+            if (isDead) return;
             OnDamaged?.Invoke();
-
             health--;
             if (health <= 0)
             {
+                anim.SetTrigger("Dying");
                 Die();
+            }
+            else {
+                anim.SetTrigger("Damaged");
             }
         }
         public virtual void Ultimated()
         {
+   
             isDead = true;
             StopAllCoroutines();
             place.Clear();
             OnKilled?.Invoke(this);
             isInPlace = false;
-            ObjectPoolController.Instance.goblinPool.Push(this);
+            anim.SetTrigger("Dying");
+            LeanTween.cancel(gameObject);
+            ParticleScript blood = ObjectPoolController.Instance.bloodPool.GetObject();
+            blood.transform.position = transform.position;
+            StartCoroutine(DieDelay());
         }
         protected virtual void Dash()
         {
             if (isPaused) return;
+            if (isDead) return;
             if (!isDashing)
             {
                 isDashing = true;
             }
+            anim.SetBool("Run", true);
             transform.Translate(new Vector3(0, 0, -dashSpeed*Time.deltaTime), Space.World);
             if (transform.position.z < -15)
             {
@@ -89,11 +102,23 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         {
             isDead = true;
             isDashing = false;
+            isInPlace = false;
             StopAllCoroutines();
             place.Clear();
             OnDie?.Invoke(this);
             OnKilled?.Invoke(this);
+            anim.SetTrigger("Dying");
+            StartCoroutine(DieDelay());
+            LeanTween.cancel(gameObject);
+        }
+        private IEnumerator DieDelay()
+        {
+            yield return new WaitForSeconds(4f);
             ObjectPoolController.Instance.goblinPool.Push(this);
+        }
+        public bool GetIsDead()
+        {
+            return isDead;
         }
         public virtual void ReachCaravan()
         {
@@ -114,6 +139,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
                 firstSpawned = true;
                 GameStart();
             }
+            anim.SetBool("Run", true);
             isDead = false;
             this.transform.position = pos;
             SetData();
@@ -128,6 +154,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
             if (!isDead)
             {
                 isInPlace = true;
+                anim.SetBool("Run", false);
             }
         }
         public virtual void SetPlace(EnemyPlace place)
@@ -137,6 +164,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         bool pausingLeanTween;
 		public virtual void Pause()
 		{
+            anim.speed = 0;
             isPaused = true;
             LeanTween.pause(gameObject);
             pausingLeanTween = true;
@@ -152,7 +180,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		public virtual void Continue()
 		{
             isPaused = false;
-            
+            anim.speed = 1;
             if (pausingLeanTween)
             {
                 pausingLeanTween = false;

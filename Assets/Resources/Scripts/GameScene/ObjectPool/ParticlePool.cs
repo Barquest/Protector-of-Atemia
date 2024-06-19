@@ -28,7 +28,6 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         public virtual ParticleScript GetObject()
         {
             ParticleScript data = null;
-
             if (pooledObject.Count > 0)
             {
                 data = pooledObject.Pop();
@@ -43,7 +42,6 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
                 if (data != null)
                 {
                     data.gameObject.SetActive(true);
-
                 }
                 return data;
             }

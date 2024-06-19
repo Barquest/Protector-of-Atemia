@@ -27,13 +27,17 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			if (collision.gameObject.CompareTag("Enemy"))
 			{
 				Debug.Log("CollisionWith Enemy");
-				collision.gameObject.GetComponent<Enemy>().Damaged();
-				ParticleScript particle = ObjectPoolController.Instance.redImpactPool.GetObject();
-				particle.transform.position = shieldTransform.position;
-				Parry();
-				NotifyObservers(Act.Attack);
-				OnAttackSuccess?.Invoke();
-				AudioManager.Instance.PlaySfx("Shield Hit");
+				Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+				if (!enemy.GetIsDead())
+				{
+					enemy.Damaged();
+					ParticleScript particle = ObjectPoolController.Instance.redImpactPool.GetObject();
+					particle.transform.position = shieldTransform.position;
+					Parry();
+					NotifyObservers(Act.Attack);
+					OnAttackSuccess?.Invoke();
+					AudioManager.Instance.PlaySfx("Shield Hit");
+				}
 			}
 		}
 		private void Parry()

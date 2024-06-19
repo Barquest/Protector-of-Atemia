@@ -100,8 +100,6 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		}
 		private IEnumerator StartDamageAllEnemies()
 		{
-
-			
 			for (int i = 0; i < enemyInScene.Count; i++)
 			{
 				ParticleScript particle = ObjectPoolController.Instance.particlePool.GetObject();
