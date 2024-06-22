@@ -110,6 +110,16 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
             particle.transform.position = transform.position;
             StartCoroutine(BackDelay());
         }
+        public void AttackCancel()
+        {
+            Debug.Log("AttackCancel");
+            isAttacking = false;
+            anim.SetBool("Attacking", false);
+            anim.ResetTrigger("Right");
+            anim.ResetTrigger("Left");
+            anim.SetBool("Back", true);
+            StartCoroutine(BackDelay());
+        }
         private IEnumerator BackDelay()
         {
             attackDelay = true;
@@ -133,8 +143,22 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
                         ParticleScript blood = ObjectPoolController.Instance.bloodPool.GetObject();
                         blood.transform.position = transform.position;
                         NotifyObservers(Act.Attack);
-                        collision.gameObject.GetComponent<Enemy>().Damaged();
+                        enemy.Damaged();
                     }
+                }
+            }
+            else if (collision.gameObject.CompareTag("Enemy Bullet"))
+            {
+                Debug.Log("Collision with Bullet");
+                if (isAttacking)
+                {
+                    Bullet bullet = collision.gameObject.GetComponent<Bullet>();
+                    bullet.Destroy();
+                    AudioManager.Instance.PlaySfx("Sword Hit");
+                    OnAttackSuccess?.Invoke();
+                    DoneAttacking();
+                    NotifyObservers(Act.Attack);
+         
                 }
             }
 		}

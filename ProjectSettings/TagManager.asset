@@ -7,6 +7,9 @@ TagManager:
   - Enemy
   - Shield
   - Level Select
+  - Sword
+  - Enemy Bullet
+  - Player Bullet
   layers:
   - Default
   - TransparentFX
@@ -19,8 +22,8 @@ TagManager:
   - Shield
   - Ultimate Effect
   - Environment
-  - 
-  - 
+  - Enemy Bullet
+  - Player Bullet
   - 
   - 
   - 

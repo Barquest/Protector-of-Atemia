@@ -6,6 +6,6 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 {
     public enum UnitType 
     {
-        Goblin
+        Goblin,GoblinBamboo, GoblinKujang, GoblinSumpit, GoblinCrossbow
     }
 }

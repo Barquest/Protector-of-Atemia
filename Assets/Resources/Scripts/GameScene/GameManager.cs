@@ -153,6 +153,10 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		{
 			caravanHealth = gameData.caravanHealth;
 		}
+		public void DamageCaravan()
+		{
+			CaravanDamaged();
+		}
 		private void CaravanDamaged()
 		{
 			if (caravanHealth > 0)

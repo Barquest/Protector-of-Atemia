@@ -155,7 +155,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 				currentWave = waves[currentWaveIndex];
 				for (int i = 0; i < currentWave.units.Count; i++)
 				{
-					SpawnEnemy(currentWave.units[i].x, currentWave.units[i].z);
+					SpawnEnemy(currentWave.units[i].type,currentWave.units[i].x, currentWave.units[i].z);
 				}
 				if (waves[currentWaveIndex].ForceNextWaveDelay > 0)
 				{
@@ -179,16 +179,34 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			int r = Random.Range(1, 5);
 			for (int i = 0; i < r; i++)
 			{
-				SpawnEnemyRandom();
+				SpawnEnemyRandom(UnitType.Goblin);
 			}
 		}
-		public void SpawnEnemyRandom()
+		public void SpawnEnemyRandom(UnitType type)
 		{
-			SpawnEnemy(Random.Range(0,5), Random.Range(0,5));
+			SpawnEnemy(type,Random.Range(0,5), Random.Range(0,5));
 		}
-		public void SpawnEnemy(int x, int z)
+		public Enemy GetEnemy(UnitType type)
+		{
+			switch (type)
+			{
+				case UnitType.Goblin:
+					return ObjectPoolController.Instance.goblinPool.GetObject();
+				case UnitType.GoblinBamboo:
+					return ObjectPoolController.Instance.goblinBambooPool.GetObject();
+				case UnitType.GoblinCrossbow:
+					return ObjectPoolController.Instance.goblinCrossbowPool.GetObject();
+				case UnitType.GoblinKujang:
+					return ObjectPoolController.Instance.goblinKujangPool.GetObject();
+				case UnitType.GoblinSumpit:
+					return ObjectPoolController.Instance.goblinSumpitPool.GetObject();
+			}
+			return null;
+		}
+		public void SpawnEnemy(UnitType type,int x, int z)
 		{
 			Debug.Log("Try SpawnEnemy");
+			Enemy enemy = GetEnemy(type);
 			for (int i = 0; i < enemyPlaces.Count; i++)
 			{
 				if (enemyPlaces[i].GetX() == x && enemyPlaces[i].GetZ() == z)
@@ -198,7 +216,6 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 						enemyPlaces[i].Occuppy();
 						Debug.Log("SpawnEnemy");
 						Vector3 position = new Vector3(enemyPlaces[i].transform.position.x, enemyPlaces[i].transform.position.y, enemyPlaces[i].transform.position.z+50);
-						Enemy enemy = ObjectPoolController.Instance.goblinPool.GetObject();
 						enemy.SetPlace(enemyPlaces[i]);
 						enemy.transform.position = position;
 						enemy.Continue();

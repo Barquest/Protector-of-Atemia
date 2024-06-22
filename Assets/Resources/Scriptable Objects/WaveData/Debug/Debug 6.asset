@@ -9,9 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbeb1ec8f80e2474fbd7e8275a305e8b, type: 3}
-  m_Name: Enemy
+  m_Script: {fileID: 11500000, guid: 66c706badc9dbda4e9ecec230be48383, type: 3}
+  m_Name: Debug 6
   m_EditorClassIdentifier: 
-  health: 1
-  dashCooldown: 2
-  dashSpeed: 20
+  units:
+  - type: 1
+    x: 2
+    z: 1
+  ForceNextWaveDelay: 0

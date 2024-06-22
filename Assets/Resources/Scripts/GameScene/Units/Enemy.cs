@@ -5,6 +5,8 @@ using System;
 
 namespace MadGeekStudio.ProtectorOfAtemia.Core
 {
+ 
+
     public class Enemy : MonoBehaviour , IPausable
     {
         [SerializeField] protected EnemyData data;
@@ -22,6 +24,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         [SerializeField] protected bool isDead;
 
         [SerializeField] protected Animator anim;
+        [SerializeField] protected LayerMask playerMask;
         // private EnemySpawnManager enemySpawnManager;
         public bool firstSpawned { get; private set; }
 
@@ -31,21 +34,26 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         public event Action<Enemy> OnReachCaravan;
         public event Action OnDamaged;
  
-        private void Update()
+        protected virtual void Update()
 		{
             if (isPaused || isGameOver)
                 return;
+            AttackDash();
+		}
+        protected virtual void AttackDash()
+        {
             if (isInPlace)
             {
                 if (currentDashCooldown > 0)
                 {
                     currentDashCooldown -= Time.deltaTime;
                 }
-                else {
+                else
+                {
                     Dash();
                 }
             }
-		}
+        }
 		private void OnDestroy()
 		{
             OnDie = null;

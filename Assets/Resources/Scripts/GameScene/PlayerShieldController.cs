@@ -39,6 +39,16 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 					AudioManager.Instance.PlaySfx("Shield Hit");
 				}
 			}
+			else if (collision.gameObject.CompareTag("Enemy Bullet"))
+			{
+				collision.gameObject.GetComponent<Bullet>().Destroy();
+				ParticleScript particle = ObjectPoolController.Instance.redImpactPool.GetObject();
+				particle.transform.position = shieldTransform.position;
+				Parry();
+				NotifyObservers(Act.Attack);
+				OnAttackSuccess?.Invoke();
+				AudioManager.Instance.PlaySfx("Shield Hit");
+			}
 		}
 		private void Parry()
 		{
