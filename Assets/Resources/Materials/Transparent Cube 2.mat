@@ -147,7 +147,11 @@ Material:
     - _ZWriteControl: 0
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+<<<<<<< Updated upstream
     - _Color: {r: 0.6830188, g: 0.57605547, b: 0.57605547, a: -0.000056838766}
+=======
+    - _Color: {r: 0.6830188, g: 0.57605547, b: 0.57605547, a: -0.0023873085}
+>>>>>>> Stashed changes
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
