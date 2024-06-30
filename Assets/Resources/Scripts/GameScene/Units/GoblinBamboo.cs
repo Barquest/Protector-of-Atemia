@@ -45,7 +45,8 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		public override void Damaged()
 		{
 			base.Damaged();
-            StopCoroutine(attackCoroutine);
+            if (attackCoroutine != null)
+                StopCoroutine(attackCoroutine);
 		}
 		private IEnumerator AttackDelay()
         {

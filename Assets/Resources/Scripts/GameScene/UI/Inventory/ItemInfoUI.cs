@@ -16,9 +16,17 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         {
             if (data != null)
             {
+              
                 itemName.text = data.name;
                 itemDescription.text = data.description;
-                itemCount.text = data.count.ToString();
+                if (data.itemType == ItemType.Consumable)
+                {
+                    Consumable con = (Consumable)data;
+                    itemCount.text = con.count.ToString();
+                }
+                else {
+                    itemCount.text = "";
+                }
                 useButton.SetActive(true);
             }
             else {
@@ -28,6 +36,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
                 useButton.SetActive(false);
             }
         }
+       
 		public void Use()
         {
             OnUse?.Invoke();

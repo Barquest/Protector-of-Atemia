@@ -20,7 +20,17 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
             {
                 this.data = data;
                 Icon.gameObject.SetActive(true);
-                Icon.sprite = GlobalGameManager.Instance.ItemDatabase().GetData(data.id).icon;
+                Icon.sprite = ItemDatabase.Instance.GetData(data.id).icon;
+                countText.text = "";
+            }
+        }
+        public void SetData(Consumable data)
+        {
+            if (data != null)
+            {
+                this.data = data;
+                Icon.gameObject.SetActive(true);
+                Icon.sprite = ItemDatabase.Instance.GetData(data.id).icon;
                 countText.text = data.count.ToString();
             }
         }
@@ -46,6 +56,14 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         public void Click()
         {
             OnClick?.Invoke(index);
+        }
+        public void SetEquipped()
+        {
+            countText.text = "E";
+        }
+        public void SetCountEmpty()
+        {
+            countText.text = "";
         }
         
     }

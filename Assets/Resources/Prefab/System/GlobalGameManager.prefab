@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2885523522204830403}
   - component: {fileID: 2015616232620811109}
   - component: {fileID: 4586303812488535457}
-  - component: {fileID: 7250176044819437449}
   m_Layer: 0
   m_Name: GlobalGameManager
   m_TagString: Untagged
@@ -47,14 +46,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameData: {fileID: 4586303812488535457}
-  itemDatabase: {fileID: 7250176044819437449}
   playerData:
     money: 0
-    unlockedLevelIndex: 
+    unlockedLevelName: []
     currentLanguage: 0
     Inventory: []
+    korvinItems:
+      equipment:
+        id: 0
+        name: 
+        description: 
+        count: 0
+      accessory:
+        id: 0
+        name: 
+        description: 
+        count: 0
+    aronaItems:
+      equipment:
+        id: 0
+        name: 
+        description: 
+        count: 0
+      accessory:
+        id: 0
+        name: 
+        description: 
+        count: 0
     musicVolume: 0
     sfxVolume: 0
+  isDebug: 0
 --- !u!114 &4586303812488535457
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68,17 +89,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelSelected: {fileID: 0}
---- !u!114 &7250176044819437449
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 265016304924211258}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc38409a009db6f44b535907e32bf91b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dataList:
-  - {fileID: 11400000, guid: fdbcd958f4168594ead6af931ed9c737, type: 2}

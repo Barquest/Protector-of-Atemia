@@ -8,6 +8,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 	{
 		[SerializeField] private Animator anim;
 		[SerializeField] private Transform shieldTransform;
+		[SerializeField] private GameObject bigShield;
 
 		public event Action OnAttackSuccess;
 		private void Start()
@@ -20,6 +21,10 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			{
 				Parry();
 			}
+		}
+		public void Skill()
+		{
+			anim.SetTrigger("Skill");
 		}
 		// Start is called before the first frame update
 		private void OnCollisionEnter(Collision collision)
@@ -67,6 +72,14 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			//{
 				anim.SetTrigger("Left");
 			//}
+		}
+		public void ActivateBigShield()
+		{
+			bigShield.SetActive(true);
+		}
+		public void DisactivateBigShield()
+		{
+			bigShield.SetActive(false);
 		}
 	}
 }

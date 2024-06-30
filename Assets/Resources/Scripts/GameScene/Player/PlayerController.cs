@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 using DentedPixel.LTExamples;
 
 namespace MadGeekStudio.ProtectorOfAtemia.Core
@@ -63,9 +65,18 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			if (isPaused || cantMove) return;
 			playerSwordController.Attack(currentLane*2);
 		}
-		public void Skill()
+		public void AronaSkill()
 		{
 			playerSwordController.Skill();
+		}
+		public void KorvinSkill()
+		{
+			playerShieldController.Skill();
+		}
+
+		public int GetCurrentLane()
+		{
+			return currentLane;
 		}
 		public void MoveLeft()
 		{
@@ -106,6 +117,32 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		{
 			isPaused = false;
 			LeanTween.resumeAll();
+		}
+		public void StopArona(float delay)
+		{
+			StartCoroutine(StopAronaDelay(delay));
+		}
+		public void StopArona(float delay,Action action)
+		{
+			StartCoroutine(StopAronaDelay(delay,action));
+		}
+		private IEnumerator StopAronaDelay(float delay)
+		{
+			playerSwordController.SetCanAttack(false);
+			playerSwordController.transform.parent = null;
+			yield return new WaitForSeconds(delay);
+			playerSwordController.SetCanAttack(true);
+			playerSwordController.ResetParent();
+		}
+		private IEnumerator StopAronaDelay(float delay,Action action)
+		{
+			playerSwordController.SetCanAttack(false);
+			playerSwordController.transform.parent = null;
+			yield return new WaitForSeconds(delay);
+			playerSwordController.SetCanAttack(true);
+			playerSwordController.ResetParent();
+			action.Invoke();
+
 		}
 	}
 }

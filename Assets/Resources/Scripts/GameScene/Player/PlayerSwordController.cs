@@ -16,6 +16,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         [SerializeField] private bool isAttacking;
         [SerializeField] private bool isDoneAttacking;
         [SerializeField] private bool attackDelay;
+        [SerializeField] private bool cantAttack;
         [SerializeField] private Transform swordParent;
 
 
@@ -33,6 +34,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		}
 		public void Attack(int lane)
         {
+            if (cantAttack) return;
             if (!isAttacking && !isDoneAttacking && !attackDelay)
             {
                 transform.parent = null;
@@ -43,20 +45,24 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
                 OnStartAttacking?.Invoke();
             }
         }
+        public void SetCanAttack(bool val)
+        {
+            cantAttack = !val;
+        }
         public void Skill()
         {
             anim.SetTrigger("Skill");
         }
         public void DashRight()
         {
-            if (!isDoneAttacking)
+            if (!isDoneAttacking && !cantAttack)
             {
                 anim.SetTrigger("Right");
             }
         }
         public void DashLeft()
         {
-            if (!isDoneAttacking)
+            if (!isDoneAttacking && !cantAttack)
             {
                 anim.SetTrigger("Left");
             }
@@ -95,6 +101,11 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
                     anim.SetBool("Back", false);
                 }
             }
+        }
+        public void ResetParent()
+        {
+            transform.position = swordParent.position;
+            transform.parent = swordParent;
         }
         
         private void DoneAttacking()

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87f2c44f013bebd4ab43a7ebd33916bd, type: 3}
+  m_Name: Eshime
+  m_EditorClassIdentifier: 
+  id: 0
+  name: Eshime Murivel
+  description: "Komandan Guard Elf yang ditugaskan oleh aliansi elf untuk mencari
+    Batu Atemia, dia beserta party kecilnya bertemu dengan Cardinal Command (Torvin
+    & Aruna) saat ekspedisi dan akhirnya memutuskan untuk berkelana merebut Batu
+    Atemia yang di curi oleh\_pasukan\_goblin"
+  allyPrefab: {fileID: 0}

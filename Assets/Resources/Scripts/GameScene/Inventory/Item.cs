@@ -5,27 +5,30 @@ using UnityEngine;
 namespace MadGeekStudio.ProtectorOfAtemia.Core
 {
     [System.Serializable]
-    public class Item   
+    public class Item
     {
-        public int id;
-        public string name;
-        public string description;
-        public int count;
+        [SerializeField] public int id;
+        [SerializeField] public string name;
+        [SerializeField] public string description;
+        [SerializeField] public Sprite icon;
+        [SerializeField] public ItemType itemType;
 
-        public Item(ItemData data,int count)
+        public Item(ItemData data)
         {
             this.id = data.id;
-            this.name = data.itemNameIndo;
-            this.description = data.descriptionIndo;
-            this.count = count;
+            this.name = data.itemName;
+            this.description = data.description;
+            this.itemType = data.type;
+            this.icon = data.icon;
         }
-        public Item(int id, int count)
+        public Item(int id)
         {
-            ItemData data = GlobalGameManager.Instance.ItemDatabase().GetData(id);
+            ItemData data = ItemDatabase.Instance.GetData(id);
             this.id = data.id;
-            this.name = data.itemNameIndo;
-            this.description = data.descriptionIndo;
-            this.count = count;
+            this.name = data.itemName;
+            this.description = data.description;
+            this.itemType = data.type;
+            this.icon = data.icon;
         }
         public void Use()
         {

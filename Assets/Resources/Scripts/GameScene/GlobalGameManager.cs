@@ -11,9 +11,10 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		public static GlobalGameManager Instance;
 
 		[SerializeField] private GlobalGameData gameData;
-		[SerializeField] private ItemDatabase itemDatabase;
+		//[SerializeField] private ItemDatabase itemDatabase;
 		[SerializeField] private PlayerData playerData;
 		[SerializeField] private Dictionary<int, int> tes;
+		[SerializeField] private bool isDebug;
 		// Start is called before the first frame update
 
 		string savePath;
@@ -33,14 +34,17 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 				Destroy(gameObject);
 			}
 		}
-		public ItemDatabase ItemDatabase()
-		{
-			return itemDatabase;
-		}
 		private void Start()
 		{
 			//LanguageManager.Instance.OnLanguageSwitch += SaveLanguageToPlayerData;
 			LanguageManager.Instance.SetLanguage(playerData.currentLanguage);
+			if (isDebug)
+			{
+				playerData.Inventory.Add((Accessories)ItemDatabase.Instance.GetAccessories(0));
+				playerData.Inventory.Add((Accessories)ItemDatabase.Instance.GetAccessories(1));
+				playerData.Inventory.Add((Accessories)ItemDatabase.Instance.GetAccessories(2));
+				playerData.Inventory.Add((Accessories)ItemDatabase.Instance.GetAccessories(3));
+			}
 		}
 		public float CurvedYCalculation(float zVal)
 		{

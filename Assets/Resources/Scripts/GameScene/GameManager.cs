@@ -17,7 +17,6 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		[SerializeField] private EnemySpawnManager enemySpawnManager;
 		[SerializeField] private CameraShake cameraShake;
 		[SerializeField] private GameUIController uiManager;
-		[SerializeField] private UltimateUIController ultimateUIController;
 		[SerializeField] private GameOverLoseUIController gameOverLoseUIController;
 		[SerializeField] private GameOverWinUIController gameOverWinUIController;
 		[SerializeField] private PauseMenuUIController pauseMenuUIController;
@@ -25,14 +24,14 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		[SerializeField] private LoadingManager loadingManager;
 		[SerializeField] private LaneHelperController laneHelperController;
 		[SerializeField] private DialogueManager dialogueManager;
+		[SerializeField] private SkillUIDisplay skillUIDisplay;
+		[SerializeField] private SkillManager skillManager;
 
 		[SerializeField] private GameData gameData;
 		[SerializeField] private int caravanHealth;
 		[SerializeField] private bool isPaused;
 		[SerializeField] private bool gameIsOver;
-		[SerializeField] private float ultimatePointOnTriggered;
-		[SerializeField] private float ultimatePoint;
-		[SerializeField] private float ultimatePointMax;
+
 
 		public bool isDebug;
 
@@ -54,15 +53,10 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			SetData();
 			gameIsOver = false;
 			enemySpawnManager.OnWaveCleared += GameOverWin;
-			ultimateUIController.OnSkillButtonPressed += UltimateAttack;
 			StageGameData.AddKillCount(0);
 			OnCaravanHealthChanged?.Invoke(caravanHealth);
 			starterHealth = caravanHealth;
-			playerController.SetShieldAction(AddUltimatePoint);
-			playerController.SetSwordAction(AddUltimatePoint);
 			playerController.SetCanMove(false);
-			playerSwordController.OnStartAttacking += ultimateUIController.DisactivateSkillButton;
-			playerSwordController.OnBackToPosition += ultimateUIController.ActivateSkillButton;
 			dialogueManager.AfterDialogueComplete += AfterDialogueComplete;
 			AudioManager.Instance.StopMusic();
 			//laneHelperController.StartDecaying();
@@ -97,6 +91,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			enemySpawnManager.Pause();
 			pauseMenuUIController.Show();
 			uiManager.Hide();
+			skillUIDisplay.Hide();
 			//LeanTween.pauseAll();
 		}
 		public void ContinueGame()
@@ -105,6 +100,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			playerController.SetCanMove(true);
 			pauseMenuUIController.Hide();
 			uiManager.Show();
+			skillUIDisplay.Show();
 			//LeanTween.resumeAll();
 
 		}
@@ -117,16 +113,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		{
 			StageGameData.AddDamagedCount(value);
 		}
-		public void AddUltimatePoint()
-		{
-			if (ultimatePoint < ultimatePointMax)
-			{
-				ultimatePoint += ultimatePointOnTriggered;
-				if (ultimatePoint > ultimatePointMax)
-					ultimatePoint = ultimatePointMax;
-				ultimateUIController.UpdateSliderValue(ultimatePoint, ultimatePointMax);
-			}
-		}
+
 		private void UltimateAttack()
 		{
 			StartCoroutine(StartUltimateAttack());
@@ -135,13 +122,11 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		{
 			Debug.Log("Ultimate Attack!!!");
 			cameraChangeController.ChangeToUltimateCamera();
-			ultimatePoint = 0;
 			enemySpawnManager.Pause();
 			playerController.Pause();
 			playerController.CenterPlayer();
-			playerController.Skill();
+			playerController.AronaSkill();
 			uiManager.Hide();
-			ultimateUIController.UpdateSliderValue(ultimatePoint, ultimatePointMax);
 			yield return new WaitForSeconds(2f);
 			enemySpawnManager.DamageAllEnemiesInScene();
 			cameraChangeController.ChangeToGameCamera();
@@ -236,11 +221,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 					Pause();
 				}
 			}
-			if (Input.GetKeyDown(KeyCode.Space))
-			{
-				ultimatePoint = ultimatePointMax;
-				ultimateUIController.UpdateSliderValue(ultimatePoint,ultimatePointMax);
-			}
+
 		}
 		private void Pause()
 		{

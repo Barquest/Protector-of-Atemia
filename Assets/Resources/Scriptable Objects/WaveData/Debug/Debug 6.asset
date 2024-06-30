@@ -13,7 +13,19 @@ MonoBehaviour:
   m_Name: Debug 6
   m_EditorClassIdentifier: 
   units:
-  - type: 1
+  - type: 0
     x: 2
     z: 1
+  - type: 0
+    x: 1
+    z: 1
+  - type: 0
+    x: 0
+    z: 1
+  - type: 0
+    x: 0
+    z: 2
+  - type: 0
+    x: 1
+    z: 2
   ForceNextWaveDelay: 0

@@ -16,4 +16,7 @@ MonoBehaviour:
   - type: 2
     x: 2
     z: 1
+  - type: 0
+    x: 1
+    z: 1
   ForceNextWaveDelay: 0

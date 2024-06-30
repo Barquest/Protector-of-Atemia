@@ -13,15 +13,19 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         public List<string> unlockedLevelName = new List<string>();
         public Languages currentLanguage;
         public List<Item> Inventory;
+        public CharacterInventory korvinItems;
+        public CharacterInventory aronaItems;
         public float musicVolume = 1;
         public float sfxVolume = 1;
 
         public void Consume(Item item)
         {
-            Item consume = Inventory.Find((x) => x == item);
+            Item it = Inventory.Find((x) => x == item);
+            Consumable consume = (Consumable)it;
+
             if (consume != null)
             {
-                consume.count--;
+                consume.SubtractCount(1);
                 if (consume.count <= 0)
                 {
                     Inventory.Remove(consume);
@@ -30,19 +34,19 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         }
         public void Consume(int index)
         {
-            Item consume = Inventory[index];
+            Consumable consume = (Consumable)Inventory[index];
             if (consume != null)
             {
-                consume.count--;
+                consume.SubtractCount(1);
                 if (consume.count <= 0)
                 {
                     Inventory.Remove(consume);
                 }
             }
         }
-        public void AddToInventory(int id,int count)
+        public void AddConsumableToInventory(int id,int count)
         {
-            Item item = GlobalGameManager.Instance.ItemDatabase().Get(id, count);
+            Consumable item = ItemDatabase.Instance.GetConsumable(id,count);
             Inventory.Add(item);
         }
     }

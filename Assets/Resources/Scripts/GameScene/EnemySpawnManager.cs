@@ -112,6 +112,57 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			yield return new WaitForSeconds(1);
 			CheckNoEnemyInScene();
 		}
+		public void DamageLaneEnemies(int whichLane)
+		{
+			Debug.Log("DamageLaneEnemies " + whichLane);
+			StartCoroutine(StartDamageLaneEnemies(whichLane));
+		}
+		private IEnumerator StartDamageLaneEnemies(int whichLane)
+		{
+			Debug.Log("StartDamageLaneEnemies");
+			yield return new WaitForSeconds(0.1f);
+
+			List<Enemy> targets = new List<Enemy>(enemyInScene);
+			for (int i = 0; i < targets.Count; i++)
+			{
+				if (targets[i].GetX() == whichLane)
+				{
+					ParticleScript particle = ObjectPoolController.Instance.particlePool.GetObject();
+					particle.transform.position = targets[i].transform.position;
+					targets[i].Damaged();
+					AudioManager.Instance.PlaySfx("Sword Hit");
+					yield return new WaitForSeconds(0.1f);
+				}
+			}
+			yield return new WaitForSeconds(1);
+			CheckNoEnemyInScene();
+		}
+		public void DamageSeveralEnemies(int count)
+		{
+			Debug.Log("DamageSeveralEnemies " + count);
+			StartCoroutine(StartDamageSeveralEnemies(count));
+		}
+		private IEnumerator StartDamageSeveralEnemies(int countToKill)
+		{
+			yield return new WaitForSeconds(0.5f);
+			int currentKilled = 0;
+			Debug.Log("StartDamageSeveralEnemies");
+			List<Enemy> targets = new List<Enemy>(enemyInScene);
+			for (int i = 0; i < targets.Count; i++)
+			{
+				if (currentKilled < countToKill)
+				{
+					ParticleScript particle = ObjectPoolController.Instance.particlePool.GetObject();
+					particle.transform.position = targets[i].transform.position;
+					targets[i].Damaged();
+					AudioManager.Instance.PlaySfx("Sword Hit");
+					currentKilled++;
+					yield return new WaitForSeconds(0.1f);
+				}
+			}
+			yield return new WaitForSeconds(1);
+			CheckNoEnemyInScene();
+		}
 		public void Continue()
 		{
 			if (isPaused)

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 654a50bc7acdbd646bcb3f57a3e658ab, type: 3}
+  m_Name: 3 Spirit Trap  (Accessories)
+  m_EditorClassIdentifier: 
+  id: 3
+  itemName: Spirit Trap
+  description: "Korvin memiliki 5 buah slot spirit untuk bisa menahan gerakan dari
+    para musuh yang bergerak selama 3 Detik \n"
+  icon: {fileID: 21300000, guid: 1810a83537919406ea939e941a5eaa7a, type: 3}
+  type: 3
+  skillList: 03000000
+  characterCanEquip: 1

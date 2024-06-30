@@ -15,5 +15,5 @@ MonoBehaviour:
   waveList:
   - {fileID: 11400000, guid: c63b839002d75fa43b8fbf3426b07789, type: 2}
   - {fileID: 11400000, guid: 99048677ca5385d4ca9799b22d4b4d1a, type: 2}
-  - {fileID: 11400000, guid: d1946651d4549f0408c8dea8d199e0f5, type: 2}
-  - {fileID: 11400000, guid: 54f5a40bff27bbc4b93cbd6915563732, type: 2}
+  - {fileID: 11400000, guid: 99048677ca5385d4ca9799b22d4b4d1a, type: 2}
+  - {fileID: 11400000, guid: 99048677ca5385d4ca9799b22d4b4d1a, type: 2}

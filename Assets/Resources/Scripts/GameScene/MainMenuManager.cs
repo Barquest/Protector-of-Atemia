@@ -17,6 +17,9 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 
 		[SerializeField] private SettingsController settingsController;
 		[SerializeField] private InventoryUIController inventoryUIController;
+		[SerializeField] private EquipmentUIController equipmentUIController;
+		[SerializeField] private CampCameraController campCameraController;
+		[SerializeField] private CharacterDisplayController CharacterDisplayController;
 		[SerializeField] private LoadingManager loadingManager;
 		[SerializeField] private TextMeshProUGUI moneyText;
 		[SerializeField] private SceneEnum currentScene;
@@ -50,7 +53,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		}
 		private void GivePlayerItemId1()
 		{
-			GlobalGameManager.Instance.GetPlayerData().AddToInventory(0, 2);
+			GlobalGameManager.Instance.GetPlayerData().AddConsumableToInventory(0, 2);
 		}
 		private void PopupTesCancel()
 		{
@@ -88,9 +91,22 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			inventoryUIController.Show();
 			Hide();
 		}
+		public void OpenEquipment()
+		{
+			equipmentUIController.Show();
+			campCameraController.ChangeCameraToIndex(1);
+			Hide();
+		}
 		public void CloseInventory()
 		{
 			inventoryUIController.Hide();
+			Show();
+		}
+		public void CloseEquipment()
+		{
+			equipmentUIController.Hide();
+			CharacterDisplayController.EmptyDisplay();
+			campCameraController.ChangeCameraToIndex(0);
 			Show();
 		}
 		public void CloseSettings()
