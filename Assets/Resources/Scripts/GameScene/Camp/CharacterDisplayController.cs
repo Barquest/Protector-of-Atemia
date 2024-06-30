@@ -7,6 +7,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
     public class CharacterDisplayController : MonoBehaviour
     {
         [SerializeField] private Transform displayParent;
+        [SerializeField] private CharacterDisplay display;
 
         public void EmptyDisplay()
         {
@@ -18,7 +19,12 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         public void DisplayCharacter(GameObject prefab)
         {
             EmptyDisplay();
-            Instantiate(prefab,displayParent.transform.position,displayParent.transform.rotation, displayParent);
+            GameObject p = Instantiate(prefab,displayParent.transform.position,displayParent.transform.rotation, displayParent);
+            display = p.GetComponent<CharacterDisplay>();
+        }
+        public void EquipWeapon(Accessories data)
+        {
+            display.ChangeWeapon(data);
         }
     }
 }

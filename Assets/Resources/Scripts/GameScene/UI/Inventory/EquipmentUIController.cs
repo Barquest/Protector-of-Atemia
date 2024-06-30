@@ -28,6 +28,8 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 
 		[SerializeField] List<Item> currentDisplay = new List<Item>();
 
+		int lastEquippedIndex;
+
 		protected virtual void Start()
 		{
 			itemInfo.OnUse += EquipSelected;
@@ -44,7 +46,6 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		{
 			base.Show();
 			itemIndexSelected = -1;
-
 			characterDisplayController.DisplayCharacter(CharacterDatabase.Instance.GetCharacterData(characterIndexSelected).prefab);
 			SetUpInventoryEmpty();
 			UpdatePlayerInventoryDisplay();
@@ -96,8 +97,10 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		public void UpdatePlayerInventoryDisplay()
 		{
 			Debug.Log("UpdatePlayerInventoryDisplay");
+
 			if (GetInventory().Count != 0)
 			{
+				
 				Debug.Log("Inventory diatas 0");
 				List<Item> playerItems = GetInventory();
 				currentDisplay.Clear();
@@ -129,12 +132,52 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			{
 				Accessories acc = GlobalGameManager.Instance.GetPlayerData().aronaItems.GetAccessories();
 				itemInfo.Info(acc);
+				if (acc !=null)
+					characterDisplayController.EquipWeapon(GlobalGameManager.Instance.GetPlayerData().aronaItems.accessory);
 			}
 			else
 			{
 				Accessories acc = GlobalGameManager.Instance.GetPlayerData().korvinItems.GetAccessories();
 				itemInfo.Info(acc);
+				if (acc != null)
+					characterDisplayController.EquipWeapon(GlobalGameManager.Instance.GetPlayerData().korvinItems.accessory);
+			}
+			bool isEmpty;
+			Accessories accEquipped = null;
+			if (currentCharacterSelected == CharacterEnum.Arona)
+			{
+				if (GlobalGameManager.Instance.GetPlayerData().aronaItems != null)
+				{
+					accEquipped = GlobalGameManager.Instance.GetPlayerData().aronaItems.accessory;
+					isEmpty = false;
+				}
+				else
+				{
+					isEmpty = true;
+				}
+			}
+			else
+			{
+				if (GlobalGameManager.Instance.GetPlayerData().korvinItems != null)
+				{
+					accEquipped = GlobalGameManager.Instance.GetPlayerData().korvinItems.accessory;
+					isEmpty = false;
+				}
+				else
+				{
+					isEmpty = true;
+				}
+			}
+			if (accEquipped != null)
+			{
+				for (int i = 0; i < currentDisplay.Count; i++)
+				{
 
+					if (currentDisplay[i].id == accEquipped.id)
+					{
+						itemList[i].SetEquipped();
+					}
+				}
 			}
 		}
 		private void CheckEquipmentInfo(int index)

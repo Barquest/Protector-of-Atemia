@@ -19,3 +19,4 @@ MonoBehaviour:
   type: 3
   skillList: 01000000
   characterCanEquip: 0
+  displayPrefab: {fileID: 5886544981200944674, guid: 1f402791ccff1964899eb1f490a00938, type: 3}

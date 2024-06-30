@@ -9,6 +9,6 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
     {
         public List<PassiveSkillType> skillList = new List<PassiveSkillType>();
         public CharacterEnum characterCanEquip;
-
+        public GameObject displayPrefab;
     }
 }
