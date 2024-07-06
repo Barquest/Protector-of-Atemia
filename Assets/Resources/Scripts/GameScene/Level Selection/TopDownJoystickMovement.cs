@@ -14,23 +14,43 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         [SerializeField] private Animator aronaAnim;
         [SerializeField] private Animator torvinAnim;
         [SerializeField] private LevelSelectManager levelSelectManager;
+        [SerializeField] private AmbushManager ambushManager;
+
+        [SerializeField] private GameObject ambushDisplay;
 
         private Rigidbody rb;
         private Vector3 movement;
         private bool isWalking;
+        private bool cantWalk;
+        private bool isTriggerActive;
         private LevelSelectButton currentLevelDisplay;
 
         void Start()
         {
+            Vector3 pos = GlobalGameManager.Instance.GetPlayerData().playerPositionInWorld;
+            if (pos != Vector3.zero)
+            {
+                transform.position = pos;
+            }
+            
+            ambushManager.OnAmbush += FreezeMovement;
+            ambushManager.OnAmbush += DisplayAmbush;
             rb = GetComponent<Rigidbody>();
+            ambushDisplay.SetActive(false);
+            StartCoroutine(TriggerActiveDelay());
         }
-
+        private IEnumerator TriggerActiveDelay()
+        {
+            yield return new WaitForSeconds(1);
+            isTriggerActive = true;
+        }
         void Update()
         {
             // Get input from the floating joystick
+            if (cantWalk)
+                return;
             movement.x = floatingJoystick.Horizontal;
             movement.z = floatingJoystick.Vertical;
-
             if (movement != Vector3.zero)
             {
                 float angle = Mathf.Atan2(-movement.z, movement.x) * Mathf.Rad2Deg;
@@ -41,6 +61,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
                     torvinAnim.SetBool("Walk", true);
                     isWalking = true;
                 }
+                ambushManager.ProgressAmbush();
             }
             else {
                 if (isWalking)
@@ -51,6 +72,23 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
                 }
             }
         }
+        private void DisplayAmbush()
+        {
+            ambushDisplay.SetActive(true);
+        }
+        private void FreezeMovement()
+        {
+            cantWalk = true;
+            movement.z = 0;
+            movement.x = 0;
+            isWalking = false;
+            aronaAnim.SetBool("Walk", false);
+            torvinAnim.SetBool("Walk", false);
+        }
+        private void UnFreezeMovement()
+        {
+            cantWalk = false;
+        }
 
         void FixedUpdate()
         {
@@ -59,6 +97,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         }
 		private void OnTriggerEnter(Collider other)
 		{
+            if (!isTriggerActive) return;
             if (other.CompareTag("Level Select"))
             {
                 currentLevelDisplay = other.GetComponent<LevelSelectButton>();
@@ -67,6 +106,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		}
 		private void OnTriggerExit(Collider other)
 		{
+            if (!isTriggerActive) return;
             if (other.CompareTag("Level Select"))
             {
                 if (currentLevelDisplay == other.GetComponent<LevelSelectButton>())

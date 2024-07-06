@@ -17,6 +17,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         public CharacterInventory aronaItems;
         public float musicVolume = 1;
         public float sfxVolume = 1;
+        public Vector3 playerPositionInWorld;
 
         public void Consume(Item item)
         {

@@ -155,6 +155,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
                         blood.transform.position = transform.position;
                         NotifyObservers(Act.Attack);
                         enemy.Damaged();
+                        GameManager.Instance.ObjectiveProgressing(ObjectiveType.SlashEenemy, 1);
                     }
                 }
             }

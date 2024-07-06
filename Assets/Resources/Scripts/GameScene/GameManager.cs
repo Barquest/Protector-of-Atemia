@@ -26,6 +26,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		[SerializeField] private DialogueManager dialogueManager;
 		[SerializeField] private SkillUIDisplay skillUIDisplay;
 		[SerializeField] private SkillManager skillManager;
+		[SerializeField] private ObjectiveManager objectiveManager;
 
 		[SerializeField] private GameData gameData;
 		[SerializeField] private int caravanHealth;
@@ -63,12 +64,21 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			dialogueManager.Hide();
 			StartCoroutine(StartDelay());
 			//enemySpawnManager.GameStart();
+			objectiveManager.SetObjectiveData(GlobalGameManager.Instance.GetLevelData().objectives);
 		}
 		private IEnumerator StartDelay()
 		{
 			uiManager.Hide();
 			yield return new WaitForSeconds(0.5f);
-			dialogueManager.ShowDialogueGroup(0);
+			//GlobalGameManager.Instance.GetLevelData().
+			DialogueGroup dialogue = GlobalGameManager.Instance.GetLevelData().dialogue;
+			if (dialogue != null)
+			{
+				dialogueManager.ShowDialogueGroup(dialogue.id);
+			}
+			else {
+				AfterDialogueComplete();
+			}
 		}
 		public void ShowGameUI()
 		{
@@ -84,6 +94,8 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			AudioManager.Instance.PlayMusic("Battle Music");
 			playerController.SetCanMove(true);
 			laneHelperController.StartDecaying();
+			ShowGameUI();
+			objectiveManager.ShowUI();
 		}
 		public void PauseGame()
 		{
@@ -104,7 +116,10 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			//LeanTween.resumeAll();
 
 		}
-		
+		public void ObjectiveProgressing(ObjectiveType type,int val)
+		{
+			objectiveManager.ProgressObjective(type, val);
+		}
 		public void AddKillCount(int value)
 		{
 			StageGameData.AddKillCount(value);
@@ -178,12 +193,14 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 				gameIsOver = true;
 				Debug.Log("Game Over Win");
 				playerController.SetCanMove(false);
-				GlobalGameManager.Instance.UnlockNewLevel();
-				GlobalGameManager.Instance.SaveGame();
 				uiManager.Hide();
 				enemySpawnManager.GameOver();
 				PlayerRewarding();
 				gameOverWinUIController.ShowWin(TotalGoldReward());
+				objectiveManager.SaveToPlayerData();
+				//GlobalGameManager.Instance.SaveGame();
+				GlobalGameManager.Instance.UnlockNewLevel();
+
 			}
 		}
 		private int TotalGoldReward()
@@ -202,6 +219,10 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		public void GotoMainMenu()
 		{
 			loadingManager.LoadScene(1);
+		}
+		public void GotoLevelSelect()
+		{
+			loadingManager.LoadScene(2);
 		}
 		public void Replay()
 		{

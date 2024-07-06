@@ -11,9 +11,29 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
         [SerializeField] private Item data;
         [SerializeField] private Image Icon;
         [SerializeField] private Image Background;
+        [SerializeField] private GameObject checkListObject;
         [SerializeField] private TextMeshProUGUI countText;
 
+
+        [SerializeField] private Sprite goldIcon;
+        [SerializeField] private Sprite defaultBg;
+        [SerializeField] private Sprite bronzeBg;
+        [SerializeField] private Sprite silverBg;
+        [SerializeField] private Sprite goldBg;
+
         public event Action<int> OnClick;
+
+        public void SetData(int gold)
+        {
+            Icon.sprite = goldIcon;
+            Icon.gameObject.SetActive(true);
+            Background.sprite = defaultBg;
+            countText.text = gold.ToString();
+        }
+        public void CheckList(bool val)
+        {
+            checkListObject.gameObject.SetActive(val);
+        }
         public void SetData(Item data)
         {
             if (data != null)
@@ -21,9 +41,43 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
                 this.data = data;
                 Icon.gameObject.SetActive(true);
                 Icon.sprite = ItemDatabase.Instance.GetData(data.id).icon;
+                Background.sprite = defaultBg;
                 countText.text = "";
             }
         }
+        public void SetIcon(Sprite data)
+        {
+            if (data != null)
+            {
+                Icon.gameObject.SetActive(true);
+                Icon.sprite = data;
+                Background.sprite = defaultBg;
+                countText.text = "";
+            }
+        }
+        public void SetData(Item data,ObjectiveReward reward)
+        {
+            if (data != null)
+            {
+                this.data = data;
+                Icon.gameObject.SetActive(true);
+                Icon.sprite = ItemDatabase.Instance.GetData(data.id).icon;
+                Background.sprite = defaultBg;
+                countText.text = "";
+                if (reward == ObjectiveReward.Bronze)
+                {
+                    Background.sprite = bronzeBg;
+                }
+                else if (reward == ObjectiveReward.Silver)
+                {
+                    Background.sprite = silverBg;
+                }
+                else {
+                    Background.sprite = goldBg;
+                }
+            }
+        }
+
         public void SetData(Consumable data)
         {
             if (data != null)

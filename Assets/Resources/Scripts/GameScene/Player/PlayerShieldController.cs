@@ -42,6 +42,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 					NotifyObservers(Act.Attack);
 					OnAttackSuccess?.Invoke();
 					AudioManager.Instance.PlaySfx("Shield Hit");
+					GameManager.Instance.ObjectiveProgressing(ObjectiveType.BashEnemy, 1);
 				}
 			}
 			else if (collision.gameObject.CompareTag("Enemy Bullet"))
@@ -53,6 +54,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 				NotifyObservers(Act.Attack);
 				OnAttackSuccess?.Invoke();
 				AudioManager.Instance.PlaySfx("Shield Hit");
+				GameManager.Instance.ObjectiveProgressing(ObjectiveType.BashEnemy, 1);
 			}
 		}
 		private void Parry()

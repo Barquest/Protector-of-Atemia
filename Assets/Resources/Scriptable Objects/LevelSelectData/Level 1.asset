@@ -16,12 +16,36 @@ MonoBehaviour:
   levelName: Level 1
   levelDescription: 
   itemDrops:
-  - id: 0
-    name: asdasd
-    description: asdasd
-    count: 1
-  itemDropsPerfect: []
+  - {fileID: 11400000, guid: 3092b740e0a33814797346972817747d, type: 2}
+  - {fileID: 11400000, guid: 3092b740e0a33814797346972817747d, type: 2}
+  itemDropsBronze:
+  - {fileID: 11400000, guid: 07b6a4a1f3574d648b659ef07d204b3d, type: 2}
+  itemDropsSilver:
+  - {fileID: 11400000, guid: e7aa07d378efcdc40b10d663dd7b1a20, type: 2}
+  itemDropsGold:
+  - {fileID: 11400000, guid: 06381689249bfb44eac3a79bf85b636a, type: 2}
+  enemies: []
+  objectives:
+  - name: Kill Goblin
+    objective: 0
+    curPoint: 2
+    maxPoint: 2
+    isIncremental: 1
+    isCompleted: 1
+  - name: Attack With Arona
+    objective: 1
+    curPoint: 2
+    maxPoint: 2
+    isIncremental: 1
+    isCompleted: 1
+  - name: Attack With Korvin
+    objective: 2
+    curPoint: 1
+    maxPoint: 1
+    isIncremental: 1
+    isCompleted: 1
+  dialogue: {fileID: 0}
   stageData: {fileID: 11400000, guid: 52d9273cabfd060468bf8468709ea128, type: 2}
   isUnlocked: 0
-  levelUnlockReward: Level 2
+  levelUnlockReward: []
   goldPool: 1000

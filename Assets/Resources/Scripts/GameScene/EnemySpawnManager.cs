@@ -58,6 +58,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 				SpawnEnemyWave();
 			}
 		}
+		
 		private void OnDestroy()
 		{
 			OnWaveCleared = null;
@@ -254,6 +255,38 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			}
 			return null;
 		}
+		public void ChangeLane(int x, int z,Enemy enemy)
+		{
+			EnemyPlace placeBefore = enemy.GetPlace();
+			EnemyPlace place = GetEnemyPlace(x, z);
+			LeanTween.moveX(enemy.gameObject, place.transform.position.x, 0.1f);
+			LeanTween.moveZ(enemy.gameObject, place.transform.position.z, 0.1f);
+			StartCoroutine(ChangeLaneDelay(enemy, place, placeBefore));
+		}
+		private IEnumerator ChangeLaneDelay(Enemy enemy,EnemyPlace place,EnemyPlace placeBefore)
+		{
+			placeBefore.Clear();
+			yield return new WaitForSeconds(1f);
+			enemy.SetPlace(place);
+		}
+		protected EnemyPlace GetEnemyPlace(int x, int z)
+		{
+			for (int i = 0; i < enemyPlaces.Count; i++)
+			{
+				if (enemyPlaces[i].GetX() == x && enemyPlaces[i].GetZ() == z)
+				{
+					if (!enemyPlaces[i].CheckIsOccuipied())
+					{
+						return enemyPlaces[i];
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
+			return null;
+		}
 		public void SpawnEnemy(UnitType type,int x, int z)
 		{
 			Debug.Log("Try SpawnEnemy");
@@ -276,6 +309,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 							enemy.OnReachCaravan += RemoveEnemyInScene;
 							enemy.OnReachCaravan += EnemyReachedCaravan;
 							enemy.OnKilled += KilledByPlayer;
+							enemy.OnChangeLane += ChangeLane;
 						}
 						enemy.Spawned(position);
 						enemyInScene.Add(enemy);

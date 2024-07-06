@@ -12,6 +12,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		[SerializeField] private LevelSelectUI levelSelectUI;
 		[SerializeField] private LevelSelectCharacter levelSelectCharacter;
 		[SerializeField] private MainMenuManager menuManager;
+		[SerializeField] private Transform playerTransform;
 
 		[SerializeField] private Dictionary<string, LevelSelectButton> levelDictionaries = new Dictionary<string, LevelSelectButton>();
 		[SerializeField] private bool isWalking;
@@ -23,7 +24,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		private void Start()
 		{
 			LeanTween.reset();
-			levelSelectCharacter.OnWalkOver += WalkOver;
+			//levelSelectCharacter.OnWalkOver += WalkOver;
 			SetupLevelList();
 			CheckLevelAvailable();
 			currentIndex = 0;
@@ -135,6 +136,8 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			}
 			else
 			{
+				Debug.Log("PlayLevel");
+				GlobalGameManager.Instance.GetPlayerData().playerPositionInWorld = playerTransform.transform.position;
 				GlobalGameManager.Instance.SetLevelData(levelSelected.GetLevelData());
 				MainMenuManager.Instance.LoadLevel(3);
 			}

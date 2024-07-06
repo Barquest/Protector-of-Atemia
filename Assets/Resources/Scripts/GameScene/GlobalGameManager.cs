@@ -14,7 +14,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		//[SerializeField] private ItemDatabase itemDatabase;
 		[SerializeField] private PlayerData playerData;
 		[SerializeField] private Dictionary<int, int> tes;
-		[SerializeField] private bool isDebug;
+		public bool isDebug;
 		// Start is called before the first frame update
 
 		string savePath;
@@ -66,6 +66,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		{
 			playerData = new PlayerData();
 			playerData.unlockedLevelName.Add("Level 1");
+			LevelDatabase.Instance.ResetData();
 			SaveGame();
 		}
 		private void DataWasLoaded(PlayerData data, SaveResult result, string message)
@@ -112,16 +113,21 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			{
 				logText += "\nError saving data";
 			}
+			PopupManager.Instance.Display(new PopupDebug("Data Saved", 2f));
 			Debug.Log(logText);
 		}
 		public void UnlockNewLevel()
 		{
-			if (!playerData.unlockedLevelName.Contains(gameData.levelSelected.levelUnlockReward))
+			for (int i = 0; i < gameData.levelSelected.levelUnlockReward.Count; i++)
 			{
-				playerData.unlockedLevelName.Add(gameData.levelSelected.levelUnlockReward);
-			}
-			else {
-				Debug.Log("Already Unlocked");
+				if (!playerData.unlockedLevelName.Contains(gameData.levelSelected.levelUnlockReward[i]))
+				{
+					playerData.unlockedLevelName.Add(gameData.levelSelected.levelUnlockReward[i]);
+				}
+				else
+				{
+					Debug.Log("Already Unlocked");
+				}
 			}
 		}
 		public void SetLevelData(LevelSelectData value)

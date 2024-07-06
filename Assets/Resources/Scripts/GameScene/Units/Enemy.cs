@@ -15,8 +15,11 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		[SerializeField] protected EnemyPlace place;
 		[SerializeField] protected float dashCooldown = 2f;
 		[SerializeField] protected float dashSpeed = 5f;
+		[SerializeField] protected float sideDashInterval = 0.1f;
 
-		[SerializeField] protected float currentDashCooldown;
+
+
+[SerializeField] protected float currentDashCooldown;
 		[SerializeField] protected bool isPaused;
 		[SerializeField] protected bool isInPlace;
 		[SerializeField] protected bool isDashing;
@@ -32,6 +35,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		public event Action<Enemy> OnDie;
 		public event Action<Enemy> OnKilled;
 		public event Action<Enemy> OnReachCaravan;
+		public event Action<int, int,Enemy> OnChangeLane;
 		public event Action OnDamaged;
 
 		protected virtual void Update()
@@ -60,6 +64,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			OnKilled = null;
 			OnReachCaravan = null;
 			OnDamaged = null;
+			OnChangeLane = null;
 		}
 		public virtual void Damaged()
 		{
@@ -119,12 +124,22 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 			anim.SetTrigger("Dying");
 			StartCoroutine(DieDelay());
 			LeanTween.cancel(gameObject);
+			GameManager.Instance.ObjectiveProgressing(ObjectiveType.killEnemy, 1);
 		}
 		private IEnumerator DieDelay()
 		{
 			yield return new WaitForSeconds(4f);
 			PushingToPool();
 		}
+		protected void ChangeLane(int x,int z)
+		{
+			OnChangeLane?.Invoke(x, z, this);
+		}
+		public EnemyPlace GetPlace()
+		{
+			return place;
+		}
+		
 		public void PushingToPool()
 		{
 			switch (data.type)

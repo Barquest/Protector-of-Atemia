@@ -6,6 +6,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
     public class EnemyData : ScriptableObject
     {
         public UnitType type;
+        public Sprite icon;
         public int health;
         public float dashCooldown = 2f;
         public float dashSpeed = 5f;

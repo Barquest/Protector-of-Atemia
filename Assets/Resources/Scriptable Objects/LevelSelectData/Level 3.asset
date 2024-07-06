@@ -16,8 +16,31 @@ MonoBehaviour:
   levelName: Level 3
   levelDescription: 
   itemDrops: []
-  itemDropsPerfect: []
+  itemDropsBronze: []
+  itemDropsSilver: []
+  itemDropsGold: []
+  enemies: []
+  objectives:
+  - name: 
+    objective: 0
+    curPoint: 0
+    maxPoint: 0
+    isIncremental: 0
+    isCompleted: 0
+  - name: 
+    objective: 0
+    curPoint: 0
+    maxPoint: 0
+    isIncremental: 0
+    isCompleted: 0
+  - name: 
+    objective: 0
+    curPoint: 0
+    maxPoint: 0
+    isIncremental: 0
+    isCompleted: 0
+  dialogue: {fileID: 0}
   stageData: {fileID: 11400000, guid: 1456a0dd60fac354682f35d0cbf36fd6, type: 2}
   isUnlocked: 0
-  levelUnlockReward: Level 4
+  levelUnlockReward: []
   goldPool: 2000

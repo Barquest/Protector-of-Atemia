@@ -49,7 +49,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		}
 		public void CloseButton()
 		{
-			AudioManager.Instance.PlaySfx("Click");
+			//AudioManager.Instance.PlaySfx("Click");
 			OnClose?.Invoke();
 		}
 		public void ResetAction()
@@ -60,7 +60,7 @@ namespace MadGeekStudio.ProtectorOfAtemia.Core
 		public void Show()
         {
 			//gameObject.SetActive(true);
-			AudioManager.Instance.PlaySfx("Popup");
+			//AudioManager.Instance.PlaySfx("Popup");
 			OnOpen?.Invoke();
             canvas.enabled = true;
 			panel.SetActive(true);
