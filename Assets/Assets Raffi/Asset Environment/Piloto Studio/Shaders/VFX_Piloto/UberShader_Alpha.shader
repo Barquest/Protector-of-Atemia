@@ -1,4 +1,4 @@
-// Made with Amplify Shader Editor v1.9.4.3
+// Made with Amplify Shader Editor v1.9.3.2
 // Available at the Unity Asset Store - http://u3d.as/y3X 
 Shader "Piloto Studio/Alpha Uber Shader"
 {
@@ -22,6 +22,8 @@ Shader "Piloto Studio/Alpha Uber Shader"
 		_DistortionIntensity("Distortion Intensity", Float) = 0
 		_DetailMultiplyChannel("Detail Multiply Channel", Vector) = (0,0,0,0)
 		_DetailAdditiveChannel("Detail Additive Channel", Vector) = (0,0,0,0)
+		[Toggle(_USESOFTALPHA_ON)] _UseSoftAlpha("UseSoftAlpha", Float) = 0
+		_SoftFadeFactor("SoftFadeFactor", Range( 0.1 , 1)) = 0
 
 
 		//_TessPhongStrength( "Tess Phong Strength", Range( 0, 1 ) ) = 0.5
@@ -181,20 +183,23 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			
 
 			HLSLPROGRAM
-            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
-            #pragma multi_compile_instancing
-            #pragma instancing_options renderinglayer
-            #define _SURFACE_TYPE_TRANSPARENT 1
-            #define ASE_SRP_VERSION 120108
 
-            #pragma multi_compile _ DOTS_INSTANCING_ON
+			#pragma multi_compile_instancing
+			#pragma instancing_options renderinglayer
+			#define _SURFACE_TYPE_TRANSPARENT 1
+			#define ASE_SRP_VERSION 120112
+			#define REQUIRE_DEPTH_TEXTURE 1
 
+
+			#pragma shader_feature_local _RECEIVE_SHADOWS_OFF
 			#pragma multi_compile_fragment _ _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3
 
 			#pragma multi_compile _ DIRLIGHTMAP_COMBINED
             #pragma multi_compile _ LIGHTMAP_ON
             #pragma multi_compile _ DYNAMICLIGHTMAP_ON
 			#pragma multi_compile_fragment _ DEBUG_DISPLAY
+
+            #pragma multi_compile _ DOTS_INSTANCING_ON
 
 			#pragma vertex vert
 			#pragma fragment frag
@@ -215,6 +220,7 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceData.hlsl"
 
 			#define ASE_NEEDS_FRAG_COLOR
+			#pragma shader_feature_local _USESOFTALPHA_ON
 
 
 			struct VertexInput
@@ -242,6 +248,7 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float4 ase_color : COLOR;
 				float4 ase_texcoord3 : TEXCOORD3;
 				float4 ase_texcoord4 : TEXCOORD4;
+				float4 ase_texcoord5 : TEXCOORD5;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
@@ -251,18 +258,19 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			float4 _DetailDistortionChannel;
 			float4 _MainTex_ST;
 			float4 _MainTextureChannel;
+			float4 _MainAlphaChannel;
 			float4 _DetailAdditiveChannel;
 			float4 _DetailMultiplyChannel;
 			float4 _AlphaOverride_ST;
 			float4 _AlphaOverrideChannel;
-			float4 _MainAlphaChannel;
 			float2 _MainTexturePanning;
 			float2 _DetailNoisePanning;
+			float2 _MainAlphaPanning;
 			float2 _FlipbooksColumsRows;
 			float2 _AlphaOverridePanning;
-			float2 _MainAlphaPanning;
-			float _DistortionIntensity;
 			float _Desaturate;
+			float _DistortionIntensity;
+			float _SoftFadeFactor;
 			#ifdef ASE_TESSELLATION
 				float _TessPhongStrength;
 				float _TessValue;
@@ -276,6 +284,7 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			sampler2D _MainTex;
 			sampler2D _DetailNoise;
 			sampler2D _AlphaOverride;
+			uniform float4 _CameraDepthTexture_TexelSize;
 
 
 			
@@ -286,6 +295,10 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				UNITY_TRANSFER_INSTANCE_ID(v, o);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
+				float4 ase_clipPos = TransformObjectToHClip((v.positionOS).xyz);
+				float4 screenPos = ComputeScreenPos(ase_clipPos);
+				o.ase_texcoord5 = screenPos;
+				
 				o.ase_color = v.ase_color;
 				o.ase_texcoord3 = v.ase_texcoord;
 				o.ase_texcoord4 = v.ase_texcoord1;
@@ -454,41 +467,23 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float2 LocalUVOffset184 = ( appendResult176 + appendResult182 );
 				float2 uv_MainTex = IN.ase_texcoord3.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 				float3 UVFlipbookInput194 = ( ( DistortionNoise90 * _DistortionIntensity ) + float3( ( LocalUVOffset184 + uv_MainTex ) ,  0.0 ) );
+				float2 break135_g119 = UVFlipbookInput194.xy;
+				float2 appendResult206_g119 = (float2(frac( break135_g119.x ) , frac( break135_g119.y )));
 				float temp_output_4_0_g119 = _FlipbooksColumsRows.x;
 				float temp_output_5_0_g119 = _FlipbooksColumsRows.y;
+				float2 appendResult116_g119 = (float2(temp_output_4_0_g119 , temp_output_5_0_g119));
+				float temp_output_122_0_g119 = ( temp_output_4_0_g119 * temp_output_5_0_g119 );
+				float2 appendResult175_g119 = (float2(temp_output_122_0_g119 , temp_output_5_0_g119));
+				float Columns213_g119 = temp_output_4_0_g119;
+				float Rows212_g119 = temp_output_5_0_g119;
+				float temp_output_133_0_g119 = ( fmod( _TimeParameters.x , ( Columns213_g119 * Rows212_g119 ) ) * 0.0 );
 				float4 texCoord75 = IN.ase_texcoord4;
 				texCoord75.xy = IN.ase_texcoord4.xy * float2( 1,1 ) + float2( 0,0 );
-				// *** BEGIN Flipbook UV Animation vars ***
-				// Total tiles of Flipbook Texture
-				float fbtotaltiles246_g119 = min( temp_output_4_0_g119 * temp_output_5_0_g119, ( ( temp_output_4_0_g119 * temp_output_5_0_g119 ) - 0.0 ) + 1 );
-				// Offsets for cols and rows of Flipbook Texture
-				float fbcolsoffset246_g119 = 1.0f / temp_output_4_0_g119;
-				float fbrowsoffset246_g119 = 1.0f / temp_output_5_0_g119;
-				// Speed of animation
-				float fbspeed246_g119 = _TimeParameters.x * 0.0;
-				// UV Tiling (col and row offset)
-				float2 fbtiling246_g119 = float2(fbcolsoffset246_g119, fbrowsoffset246_g119);
-				// UV Offset - calculate current tile linear index, and convert it to (X * coloffset, Y * rowoffset)
-				// Calculate current tile linear index
-				float fbcurrenttileindex246_g119 = floor( fmod( fbspeed246_g119 + texCoord75.x, fbtotaltiles246_g119) );
-				fbcurrenttileindex246_g119 += ( fbcurrenttileindex246_g119 < 0) ? fbtotaltiles246_g119 : 0;
-				// Obtain Offset X coordinate from current tile linear index
-				float fblinearindextox246_g119 = round ( fmod ( fbcurrenttileindex246_g119, temp_output_4_0_g119 ) );
-				// Multiply Offset X by coloffset
-				float fboffsetx246_g119 = fblinearindextox246_g119 * fbcolsoffset246_g119;
-				// Obtain Offset Y coordinate from current tile linear index
-				float fblinearindextoy246_g119 = round( fmod( ( fbcurrenttileindex246_g119 - fblinearindextox246_g119 ) / temp_output_4_0_g119, temp_output_5_0_g119 ) );
-				// Reverse Y to get tiles from Top to Bottom
-				fblinearindextoy246_g119 = (int)(temp_output_5_0_g119-1) - fblinearindextoy246_g119;
-				// Multiply Offset Y by rowoffset
-				float fboffsety246_g119 = fblinearindextoy246_g119 * fbrowsoffset246_g119;
-				// UV Offset
-				float2 fboffset246_g119 = float2(fboffsetx246_g119, fboffsety246_g119);
-				// Flipbook UV
-				half2 fbuv246_g119 = UVFlipbookInput194.xy * fbtiling246_g119 + fboffset246_g119;
-				// *** END Flipbook UV Animation vars ***
-				int flipbookFrame246_g119 = ( ( int )fbcurrenttileindex246_g119);
-				float2 temp_output_73_0 = fbuv246_g119;
+				float clampResult129_g119 = clamp( texCoord75.x , 1E-05 , ( temp_output_122_0_g119 - 1.0 ) );
+				float temp_output_185_0_g119 = frac( ( ( temp_output_133_0_g119 + ( clampResult129_g119 + 1E-05 ) ) / temp_output_122_0_g119 ) );
+				float2 appendResult186_g119 = (float2(temp_output_185_0_g119 , ( 1.0 - temp_output_185_0_g119 )));
+				float2 temp_output_203_0_g119 = ( ( appendResult206_g119 / appendResult116_g119 ) + ( floor( ( appendResult175_g119 * appendResult186_g119 ) ) / appendResult116_g119 ) );
+				float2 temp_output_73_0 = temp_output_203_0_g119;
 				float2 panner22 = ( 1.0 * _Time.y * _MainTexturePanning + temp_output_73_0);
 				float4 break17_g143 = tex2D( _MainTex, panner22 );
 				float4 appendResult18_g143 = (float4(break17_g143.x , break17_g143.y , break17_g143.z , break17_g143.w));
@@ -525,24 +520,21 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float3 MultiplyNoise92 = desaturateVar189;
 				
 				float2 uv_AlphaOverride = IN.ase_texcoord3.xy * _AlphaOverride_ST.xy + _AlphaOverride_ST.zw;
+				float2 break135_g118 = ( LocalUVOffset184 + uv_AlphaOverride );
+				float2 appendResult206_g118 = (float2(frac( break135_g118.x ) , frac( break135_g118.y )));
 				float temp_output_4_0_g118 = _FlipbooksColumsRows.x;
 				float temp_output_5_0_g118 = _FlipbooksColumsRows.y;
-				float fbtotaltiles246_g118 = min( temp_output_4_0_g118 * temp_output_5_0_g118, ( ( temp_output_4_0_g118 * temp_output_5_0_g118 ) - 0.0 ) + 1 );
-				float fbcolsoffset246_g118 = 1.0f / temp_output_4_0_g118;
-				float fbrowsoffset246_g118 = 1.0f / temp_output_5_0_g118;
-				float fbspeed246_g118 = _TimeParameters.x * 0.0;
-				float2 fbtiling246_g118 = float2(fbcolsoffset246_g118, fbrowsoffset246_g118);
-				float fbcurrenttileindex246_g118 = floor( fmod( fbspeed246_g118 + texCoord75.x, fbtotaltiles246_g118) );
-				fbcurrenttileindex246_g118 += ( fbcurrenttileindex246_g118 < 0) ? fbtotaltiles246_g118 : 0;
-				float fblinearindextox246_g118 = round ( fmod ( fbcurrenttileindex246_g118, temp_output_4_0_g118 ) );
-				float fboffsetx246_g118 = fblinearindextox246_g118 * fbcolsoffset246_g118;
-				float fblinearindextoy246_g118 = round( fmod( ( fbcurrenttileindex246_g118 - fblinearindextox246_g118 ) / temp_output_4_0_g118, temp_output_5_0_g118 ) );
-				fblinearindextoy246_g118 = (int)(temp_output_5_0_g118-1) - fblinearindextoy246_g118;
-				float fboffsety246_g118 = fblinearindextoy246_g118 * fbrowsoffset246_g118;
-				float2 fboffset246_g118 = float2(fboffsetx246_g118, fboffsety246_g118);
-				half2 fbuv246_g118 = ( LocalUVOffset184 + uv_AlphaOverride ) * fbtiling246_g118 + fboffset246_g118;
-				int flipbookFrame246_g118 = ( ( int )fbcurrenttileindex246_g118);
-				float2 panner44 = ( 1.0 * _Time.y * _AlphaOverridePanning + fbuv246_g118);
+				float2 appendResult116_g118 = (float2(temp_output_4_0_g118 , temp_output_5_0_g118));
+				float temp_output_122_0_g118 = ( temp_output_4_0_g118 * temp_output_5_0_g118 );
+				float2 appendResult175_g118 = (float2(temp_output_122_0_g118 , temp_output_5_0_g118));
+				float Columns213_g118 = temp_output_4_0_g118;
+				float Rows212_g118 = temp_output_5_0_g118;
+				float temp_output_133_0_g118 = ( fmod( _TimeParameters.x , ( Columns213_g118 * Rows212_g118 ) ) * 0.0 );
+				float clampResult129_g118 = clamp( texCoord75.x , 1E-05 , ( temp_output_122_0_g118 - 1.0 ) );
+				float temp_output_185_0_g118 = frac( ( ( temp_output_133_0_g118 + ( clampResult129_g118 + 1E-05 ) ) / temp_output_122_0_g118 ) );
+				float2 appendResult186_g118 = (float2(temp_output_185_0_g118 , ( 1.0 - temp_output_185_0_g118 )));
+				float2 temp_output_203_0_g118 = ( ( appendResult206_g118 / appendResult116_g118 ) + ( floor( ( appendResult175_g118 * appendResult186_g118 ) ) / appendResult116_g118 ) );
+				float2 panner44 = ( 1.0 * _Time.y * _AlphaOverridePanning + temp_output_203_0_g118);
 				float4 break2_g121 = ( tex2D( _AlphaOverride, panner44 ) * _AlphaOverrideChannel );
 				float AlphaOverride49 = saturate( ( break2_g121.x + break2_g121.y + break2_g121.z + break2_g121.w ) );
 				float2 panner33 = ( 1.0 * _Time.y * _MainAlphaPanning + temp_output_73_0);
@@ -553,11 +545,21 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				texCoord60.xy = IN.ase_texcoord3.xy * float2( 1,1 ) + float2( 0,0 );
 				float temp_output_3_0_g122 = ( texCoord60.w - ( 1.0 - temp_output_55_0 ) );
 				float temp_output_40_0 = ( IN.ase_color.a * temp_output_55_0 * saturate( saturate( ( temp_output_3_0_g122 / fwidth( temp_output_3_0_g122 ) ) ) ) );
+				float4 screenPos = IN.ase_texcoord5;
+				float4 ase_screenPosNorm = screenPos / screenPos.w;
+				ase_screenPosNorm.z = ( UNITY_NEAR_CLIP_VALUE >= 0 ) ? ase_screenPosNorm.z : ase_screenPosNorm.z * 0.5 + 0.5;
+				float screenDepth199 = LinearEyeDepth(SHADERGRAPH_SAMPLE_SCENE_DEPTH( ase_screenPosNorm.xy ),_ZBufferParams);
+				float distanceDepth199 = abs( ( screenDepth199 - LinearEyeDepth( ase_screenPosNorm.z,_ZBufferParams ) ) / ( _SoftFadeFactor ) );
+				#ifdef _USESOFTALPHA_ON
+				float staticSwitch198 = ( temp_output_40_0 * saturate( distanceDepth199 ) );
+				#else
+				float staticSwitch198 = temp_output_40_0;
+				#endif
 				
 				float3 BakedAlbedo = 0;
 				float3 BakedEmission = 0;
 				float3 Color = ( IN.ase_color * float4( ( desaturateVar166 + AdditiveNoise91 ) , 0.0 ) * ( texCoord71.z + 1.0 ) * float4( MultiplyNoise92 , 0.0 ) ).rgb;
-				float Alpha = temp_output_40_0;
+				float Alpha = staticSwitch198;
 				float AlphaClipThreshold = 0.5;
 				float AlphaClipThresholdShadow = 0.5;
 
@@ -567,6 +569,10 @@ Shader "Piloto Studio/Alpha Uber Shader"
 
 				#if defined(_DBUFFER)
 					ApplyDecalToBaseColor(IN.positionCS, Color);
+				#endif
+
+				#if defined(_ALPHAPREMULTIPLY_ON)
+				Color *= Alpha;
 				#endif
 
 				#ifdef LOD_FADE_CROSSFADE
@@ -594,9 +600,12 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			AlphaToMask Off
 
 			HLSLPROGRAM
+
             #pragma multi_compile_instancing
             #define _SURFACE_TYPE_TRANSPARENT 1
-            #define ASE_SRP_VERSION 120108
+            #define ASE_SRP_VERSION 120112
+            #define REQUIRE_DEPTH_TEXTURE 1
+
 
             #pragma multi_compile _ DOTS_INSTANCING_ON
 
@@ -608,7 +617,9 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderGraphFunctions.hlsl"
 
-			
+			#define ASE_NEEDS_FRAG_COLOR
+			#pragma shader_feature_local _USESOFTALPHA_ON
+
 
 			struct VertexInput
 			{
@@ -632,6 +643,7 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float4 ase_color : COLOR;
 				float4 ase_texcoord2 : TEXCOORD2;
 				float4 ase_texcoord3 : TEXCOORD3;
+				float4 ase_texcoord4 : TEXCOORD4;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
@@ -641,18 +653,19 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			float4 _DetailDistortionChannel;
 			float4 _MainTex_ST;
 			float4 _MainTextureChannel;
+			float4 _MainAlphaChannel;
 			float4 _DetailAdditiveChannel;
 			float4 _DetailMultiplyChannel;
 			float4 _AlphaOverride_ST;
 			float4 _AlphaOverrideChannel;
-			float4 _MainAlphaChannel;
 			float2 _MainTexturePanning;
 			float2 _DetailNoisePanning;
+			float2 _MainAlphaPanning;
 			float2 _FlipbooksColumsRows;
 			float2 _AlphaOverridePanning;
-			float2 _MainAlphaPanning;
-			float _DistortionIntensity;
 			float _Desaturate;
+			float _DistortionIntensity;
+			float _SoftFadeFactor;
 			#ifdef ASE_TESSELLATION
 				float _TessPhongStrength;
 				float _TessValue;
@@ -666,6 +679,7 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			sampler2D _AlphaOverride;
 			sampler2D _MainTex;
 			sampler2D _DetailNoise;
+			uniform float4 _CameraDepthTexture_TexelSize;
 
 
 			
@@ -676,6 +690,10 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				UNITY_TRANSFER_INSTANCE_ID(v, o);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
+				float4 ase_clipPos = TransformObjectToHClip((v.positionOS).xyz);
+				float4 screenPos = ComputeScreenPos(ase_clipPos);
+				o.ase_texcoord4 = screenPos;
+				
 				o.ase_color = v.ase_color;
 				o.ase_texcoord2 = v.ase_texcoord1;
 				o.ase_texcoord3 = v.ase_texcoord;
@@ -824,41 +842,23 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float2 appendResult182 = (float2(0.0 , 0.0));
 				float2 LocalUVOffset184 = ( appendResult176 + appendResult182 );
 				float2 uv_AlphaOverride = IN.ase_texcoord3.xy * _AlphaOverride_ST.xy + _AlphaOverride_ST.zw;
+				float2 break135_g118 = ( LocalUVOffset184 + uv_AlphaOverride );
+				float2 appendResult206_g118 = (float2(frac( break135_g118.x ) , frac( break135_g118.y )));
 				float temp_output_4_0_g118 = _FlipbooksColumsRows.x;
 				float temp_output_5_0_g118 = _FlipbooksColumsRows.y;
+				float2 appendResult116_g118 = (float2(temp_output_4_0_g118 , temp_output_5_0_g118));
+				float temp_output_122_0_g118 = ( temp_output_4_0_g118 * temp_output_5_0_g118 );
+				float2 appendResult175_g118 = (float2(temp_output_122_0_g118 , temp_output_5_0_g118));
+				float Columns213_g118 = temp_output_4_0_g118;
+				float Rows212_g118 = temp_output_5_0_g118;
+				float temp_output_133_0_g118 = ( fmod( _TimeParameters.x , ( Columns213_g118 * Rows212_g118 ) ) * 0.0 );
 				float4 texCoord75 = IN.ase_texcoord2;
 				texCoord75.xy = IN.ase_texcoord2.xy * float2( 1,1 ) + float2( 0,0 );
-				// *** BEGIN Flipbook UV Animation vars ***
-				// Total tiles of Flipbook Texture
-				float fbtotaltiles246_g118 = min( temp_output_4_0_g118 * temp_output_5_0_g118, ( ( temp_output_4_0_g118 * temp_output_5_0_g118 ) - 0.0 ) + 1 );
-				// Offsets for cols and rows of Flipbook Texture
-				float fbcolsoffset246_g118 = 1.0f / temp_output_4_0_g118;
-				float fbrowsoffset246_g118 = 1.0f / temp_output_5_0_g118;
-				// Speed of animation
-				float fbspeed246_g118 = _TimeParameters.x * 0.0;
-				// UV Tiling (col and row offset)
-				float2 fbtiling246_g118 = float2(fbcolsoffset246_g118, fbrowsoffset246_g118);
-				// UV Offset - calculate current tile linear index, and convert it to (X * coloffset, Y * rowoffset)
-				// Calculate current tile linear index
-				float fbcurrenttileindex246_g118 = floor( fmod( fbspeed246_g118 + texCoord75.x, fbtotaltiles246_g118) );
-				fbcurrenttileindex246_g118 += ( fbcurrenttileindex246_g118 < 0) ? fbtotaltiles246_g118 : 0;
-				// Obtain Offset X coordinate from current tile linear index
-				float fblinearindextox246_g118 = round ( fmod ( fbcurrenttileindex246_g118, temp_output_4_0_g118 ) );
-				// Multiply Offset X by coloffset
-				float fboffsetx246_g118 = fblinearindextox246_g118 * fbcolsoffset246_g118;
-				// Obtain Offset Y coordinate from current tile linear index
-				float fblinearindextoy246_g118 = round( fmod( ( fbcurrenttileindex246_g118 - fblinearindextox246_g118 ) / temp_output_4_0_g118, temp_output_5_0_g118 ) );
-				// Reverse Y to get tiles from Top to Bottom
-				fblinearindextoy246_g118 = (int)(temp_output_5_0_g118-1) - fblinearindextoy246_g118;
-				// Multiply Offset Y by rowoffset
-				float fboffsety246_g118 = fblinearindextoy246_g118 * fbrowsoffset246_g118;
-				// UV Offset
-				float2 fboffset246_g118 = float2(fboffsetx246_g118, fboffsety246_g118);
-				// Flipbook UV
-				half2 fbuv246_g118 = ( LocalUVOffset184 + uv_AlphaOverride ) * fbtiling246_g118 + fboffset246_g118;
-				// *** END Flipbook UV Animation vars ***
-				int flipbookFrame246_g118 = ( ( int )fbcurrenttileindex246_g118);
-				float2 panner44 = ( 1.0 * _Time.y * _AlphaOverridePanning + fbuv246_g118);
+				float clampResult129_g118 = clamp( texCoord75.x , 1E-05 , ( temp_output_122_0_g118 - 1.0 ) );
+				float temp_output_185_0_g118 = frac( ( ( temp_output_133_0_g118 + ( clampResult129_g118 + 1E-05 ) ) / temp_output_122_0_g118 ) );
+				float2 appendResult186_g118 = (float2(temp_output_185_0_g118 , ( 1.0 - temp_output_185_0_g118 )));
+				float2 temp_output_203_0_g118 = ( ( appendResult206_g118 / appendResult116_g118 ) + ( floor( ( appendResult175_g118 * appendResult186_g118 ) ) / appendResult116_g118 ) );
+				float2 panner44 = ( 1.0 * _Time.y * _AlphaOverridePanning + temp_output_203_0_g118);
 				float4 break2_g121 = ( tex2D( _AlphaOverride, panner44 ) * _AlphaOverrideChannel );
 				float AlphaOverride49 = saturate( ( break2_g121.x + break2_g121.y + break2_g121.z + break2_g121.w ) );
 				float2 uv_DetailNoise = IN.ase_texcoord3.xy * _DetailNoise_ST.xy + _DetailNoise_ST.zw;
@@ -876,24 +876,21 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float3 DistortionNoise90 = desaturateVar190;
 				float2 uv_MainTex = IN.ase_texcoord3.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 				float3 UVFlipbookInput194 = ( ( DistortionNoise90 * _DistortionIntensity ) + float3( ( LocalUVOffset184 + uv_MainTex ) ,  0.0 ) );
+				float2 break135_g119 = UVFlipbookInput194.xy;
+				float2 appendResult206_g119 = (float2(frac( break135_g119.x ) , frac( break135_g119.y )));
 				float temp_output_4_0_g119 = _FlipbooksColumsRows.x;
 				float temp_output_5_0_g119 = _FlipbooksColumsRows.y;
-				float fbtotaltiles246_g119 = min( temp_output_4_0_g119 * temp_output_5_0_g119, ( ( temp_output_4_0_g119 * temp_output_5_0_g119 ) - 0.0 ) + 1 );
-				float fbcolsoffset246_g119 = 1.0f / temp_output_4_0_g119;
-				float fbrowsoffset246_g119 = 1.0f / temp_output_5_0_g119;
-				float fbspeed246_g119 = _TimeParameters.x * 0.0;
-				float2 fbtiling246_g119 = float2(fbcolsoffset246_g119, fbrowsoffset246_g119);
-				float fbcurrenttileindex246_g119 = floor( fmod( fbspeed246_g119 + texCoord75.x, fbtotaltiles246_g119) );
-				fbcurrenttileindex246_g119 += ( fbcurrenttileindex246_g119 < 0) ? fbtotaltiles246_g119 : 0;
-				float fblinearindextox246_g119 = round ( fmod ( fbcurrenttileindex246_g119, temp_output_4_0_g119 ) );
-				float fboffsetx246_g119 = fblinearindextox246_g119 * fbcolsoffset246_g119;
-				float fblinearindextoy246_g119 = round( fmod( ( fbcurrenttileindex246_g119 - fblinearindextox246_g119 ) / temp_output_4_0_g119, temp_output_5_0_g119 ) );
-				fblinearindextoy246_g119 = (int)(temp_output_5_0_g119-1) - fblinearindextoy246_g119;
-				float fboffsety246_g119 = fblinearindextoy246_g119 * fbrowsoffset246_g119;
-				float2 fboffset246_g119 = float2(fboffsetx246_g119, fboffsety246_g119);
-				half2 fbuv246_g119 = UVFlipbookInput194.xy * fbtiling246_g119 + fboffset246_g119;
-				int flipbookFrame246_g119 = ( ( int )fbcurrenttileindex246_g119);
-				float2 temp_output_73_0 = fbuv246_g119;
+				float2 appendResult116_g119 = (float2(temp_output_4_0_g119 , temp_output_5_0_g119));
+				float temp_output_122_0_g119 = ( temp_output_4_0_g119 * temp_output_5_0_g119 );
+				float2 appendResult175_g119 = (float2(temp_output_122_0_g119 , temp_output_5_0_g119));
+				float Columns213_g119 = temp_output_4_0_g119;
+				float Rows212_g119 = temp_output_5_0_g119;
+				float temp_output_133_0_g119 = ( fmod( _TimeParameters.x , ( Columns213_g119 * Rows212_g119 ) ) * 0.0 );
+				float clampResult129_g119 = clamp( texCoord75.x , 1E-05 , ( temp_output_122_0_g119 - 1.0 ) );
+				float temp_output_185_0_g119 = frac( ( ( temp_output_133_0_g119 + ( clampResult129_g119 + 1E-05 ) ) / temp_output_122_0_g119 ) );
+				float2 appendResult186_g119 = (float2(temp_output_185_0_g119 , ( 1.0 - temp_output_185_0_g119 )));
+				float2 temp_output_203_0_g119 = ( ( appendResult206_g119 / appendResult116_g119 ) + ( floor( ( appendResult175_g119 * appendResult186_g119 ) ) / appendResult116_g119 ) );
+				float2 temp_output_73_0 = temp_output_203_0_g119;
 				float2 panner33 = ( 1.0 * _Time.y * _MainAlphaPanning + temp_output_73_0);
 				float4 break2_g120 = ( tex2D( _MainTex, panner33 ) * _MainAlphaChannel );
 				float MainAlpha30 = saturate( ( break2_g120.x + break2_g120.y + break2_g120.z + break2_g120.w ) );
@@ -902,9 +899,19 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				texCoord60.xy = IN.ase_texcoord3.xy * float2( 1,1 ) + float2( 0,0 );
 				float temp_output_3_0_g122 = ( texCoord60.w - ( 1.0 - temp_output_55_0 ) );
 				float temp_output_40_0 = ( IN.ase_color.a * temp_output_55_0 * saturate( saturate( ( temp_output_3_0_g122 / fwidth( temp_output_3_0_g122 ) ) ) ) );
+				float4 screenPos = IN.ase_texcoord4;
+				float4 ase_screenPosNorm = screenPos / screenPos.w;
+				ase_screenPosNorm.z = ( UNITY_NEAR_CLIP_VALUE >= 0 ) ? ase_screenPosNorm.z : ase_screenPosNorm.z * 0.5 + 0.5;
+				float screenDepth199 = LinearEyeDepth(SHADERGRAPH_SAMPLE_SCENE_DEPTH( ase_screenPosNorm.xy ),_ZBufferParams);
+				float distanceDepth199 = abs( ( screenDepth199 - LinearEyeDepth( ase_screenPosNorm.z,_ZBufferParams ) ) / ( _SoftFadeFactor ) );
+				#ifdef _USESOFTALPHA_ON
+				float staticSwitch198 = ( temp_output_40_0 * saturate( distanceDepth199 ) );
+				#else
+				float staticSwitch198 = temp_output_40_0;
+				#endif
 				
 
-				float Alpha = temp_output_40_0;
+				float Alpha = staticSwitch198;
 				float AlphaClipThreshold = 0.5;
 
 				#ifdef _ALPHATEST_ON
@@ -930,8 +937,11 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			AlphaToMask Off
 
 			HLSLPROGRAM
+
             #define _SURFACE_TYPE_TRANSPARENT 1
-            #define ASE_SRP_VERSION 120108
+            #define ASE_SRP_VERSION 120112
+            #define REQUIRE_DEPTH_TEXTURE 1
+
 
             #pragma multi_compile _ DOTS_INSTANCING_ON
 
@@ -950,7 +960,9 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderGraphFunctions.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderPass.hlsl"
 
-			
+			#define ASE_NEEDS_FRAG_COLOR
+			#pragma shader_feature_local _USESOFTALPHA_ON
+
 
 			struct VertexInput
 			{
@@ -968,6 +980,7 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float4 ase_color : COLOR;
 				float4 ase_texcoord : TEXCOORD0;
 				float4 ase_texcoord1 : TEXCOORD1;
+				float4 ase_texcoord2 : TEXCOORD2;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
@@ -977,18 +990,19 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			float4 _DetailDistortionChannel;
 			float4 _MainTex_ST;
 			float4 _MainTextureChannel;
+			float4 _MainAlphaChannel;
 			float4 _DetailAdditiveChannel;
 			float4 _DetailMultiplyChannel;
 			float4 _AlphaOverride_ST;
 			float4 _AlphaOverrideChannel;
-			float4 _MainAlphaChannel;
 			float2 _MainTexturePanning;
 			float2 _DetailNoisePanning;
+			float2 _MainAlphaPanning;
 			float2 _FlipbooksColumsRows;
 			float2 _AlphaOverridePanning;
-			float2 _MainAlphaPanning;
-			float _DistortionIntensity;
 			float _Desaturate;
+			float _DistortionIntensity;
+			float _SoftFadeFactor;
 			#ifdef ASE_TESSELLATION
 				float _TessPhongStrength;
 				float _TessValue;
@@ -1002,6 +1016,7 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			sampler2D _AlphaOverride;
 			sampler2D _MainTex;
 			sampler2D _DetailNoise;
+			uniform float4 _CameraDepthTexture_TexelSize;
 
 
 			
@@ -1023,6 +1038,10 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				UNITY_TRANSFER_INSTANCE_ID(v, o);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
+				float4 ase_clipPos = TransformObjectToHClip((v.positionOS).xyz);
+				float4 screenPos = ComputeScreenPos(ase_clipPos);
+				o.ase_texcoord2 = screenPos;
+				
 				o.ase_color = v.ase_color;
 				o.ase_texcoord = v.ase_texcoord1;
 				o.ase_texcoord1 = v.ase_texcoord;
@@ -1146,41 +1165,23 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float2 appendResult182 = (float2(0.0 , 0.0));
 				float2 LocalUVOffset184 = ( appendResult176 + appendResult182 );
 				float2 uv_AlphaOverride = IN.ase_texcoord1.xy * _AlphaOverride_ST.xy + _AlphaOverride_ST.zw;
+				float2 break135_g118 = ( LocalUVOffset184 + uv_AlphaOverride );
+				float2 appendResult206_g118 = (float2(frac( break135_g118.x ) , frac( break135_g118.y )));
 				float temp_output_4_0_g118 = _FlipbooksColumsRows.x;
 				float temp_output_5_0_g118 = _FlipbooksColumsRows.y;
+				float2 appendResult116_g118 = (float2(temp_output_4_0_g118 , temp_output_5_0_g118));
+				float temp_output_122_0_g118 = ( temp_output_4_0_g118 * temp_output_5_0_g118 );
+				float2 appendResult175_g118 = (float2(temp_output_122_0_g118 , temp_output_5_0_g118));
+				float Columns213_g118 = temp_output_4_0_g118;
+				float Rows212_g118 = temp_output_5_0_g118;
+				float temp_output_133_0_g118 = ( fmod( _TimeParameters.x , ( Columns213_g118 * Rows212_g118 ) ) * 0.0 );
 				float4 texCoord75 = IN.ase_texcoord;
 				texCoord75.xy = IN.ase_texcoord.xy * float2( 1,1 ) + float2( 0,0 );
-				// *** BEGIN Flipbook UV Animation vars ***
-				// Total tiles of Flipbook Texture
-				float fbtotaltiles246_g118 = min( temp_output_4_0_g118 * temp_output_5_0_g118, ( ( temp_output_4_0_g118 * temp_output_5_0_g118 ) - 0.0 ) + 1 );
-				// Offsets for cols and rows of Flipbook Texture
-				float fbcolsoffset246_g118 = 1.0f / temp_output_4_0_g118;
-				float fbrowsoffset246_g118 = 1.0f / temp_output_5_0_g118;
-				// Speed of animation
-				float fbspeed246_g118 = _TimeParameters.x * 0.0;
-				// UV Tiling (col and row offset)
-				float2 fbtiling246_g118 = float2(fbcolsoffset246_g118, fbrowsoffset246_g118);
-				// UV Offset - calculate current tile linear index, and convert it to (X * coloffset, Y * rowoffset)
-				// Calculate current tile linear index
-				float fbcurrenttileindex246_g118 = floor( fmod( fbspeed246_g118 + texCoord75.x, fbtotaltiles246_g118) );
-				fbcurrenttileindex246_g118 += ( fbcurrenttileindex246_g118 < 0) ? fbtotaltiles246_g118 : 0;
-				// Obtain Offset X coordinate from current tile linear index
-				float fblinearindextox246_g118 = round ( fmod ( fbcurrenttileindex246_g118, temp_output_4_0_g118 ) );
-				// Multiply Offset X by coloffset
-				float fboffsetx246_g118 = fblinearindextox246_g118 * fbcolsoffset246_g118;
-				// Obtain Offset Y coordinate from current tile linear index
-				float fblinearindextoy246_g118 = round( fmod( ( fbcurrenttileindex246_g118 - fblinearindextox246_g118 ) / temp_output_4_0_g118, temp_output_5_0_g118 ) );
-				// Reverse Y to get tiles from Top to Bottom
-				fblinearindextoy246_g118 = (int)(temp_output_5_0_g118-1) - fblinearindextoy246_g118;
-				// Multiply Offset Y by rowoffset
-				float fboffsety246_g118 = fblinearindextoy246_g118 * fbrowsoffset246_g118;
-				// UV Offset
-				float2 fboffset246_g118 = float2(fboffsetx246_g118, fboffsety246_g118);
-				// Flipbook UV
-				half2 fbuv246_g118 = ( LocalUVOffset184 + uv_AlphaOverride ) * fbtiling246_g118 + fboffset246_g118;
-				// *** END Flipbook UV Animation vars ***
-				int flipbookFrame246_g118 = ( ( int )fbcurrenttileindex246_g118);
-				float2 panner44 = ( 1.0 * _Time.y * _AlphaOverridePanning + fbuv246_g118);
+				float clampResult129_g118 = clamp( texCoord75.x , 1E-05 , ( temp_output_122_0_g118 - 1.0 ) );
+				float temp_output_185_0_g118 = frac( ( ( temp_output_133_0_g118 + ( clampResult129_g118 + 1E-05 ) ) / temp_output_122_0_g118 ) );
+				float2 appendResult186_g118 = (float2(temp_output_185_0_g118 , ( 1.0 - temp_output_185_0_g118 )));
+				float2 temp_output_203_0_g118 = ( ( appendResult206_g118 / appendResult116_g118 ) + ( floor( ( appendResult175_g118 * appendResult186_g118 ) ) / appendResult116_g118 ) );
+				float2 panner44 = ( 1.0 * _Time.y * _AlphaOverridePanning + temp_output_203_0_g118);
 				float4 break2_g121 = ( tex2D( _AlphaOverride, panner44 ) * _AlphaOverrideChannel );
 				float AlphaOverride49 = saturate( ( break2_g121.x + break2_g121.y + break2_g121.z + break2_g121.w ) );
 				float2 uv_DetailNoise = IN.ase_texcoord1.xy * _DetailNoise_ST.xy + _DetailNoise_ST.zw;
@@ -1198,24 +1199,21 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float3 DistortionNoise90 = desaturateVar190;
 				float2 uv_MainTex = IN.ase_texcoord1.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 				float3 UVFlipbookInput194 = ( ( DistortionNoise90 * _DistortionIntensity ) + float3( ( LocalUVOffset184 + uv_MainTex ) ,  0.0 ) );
+				float2 break135_g119 = UVFlipbookInput194.xy;
+				float2 appendResult206_g119 = (float2(frac( break135_g119.x ) , frac( break135_g119.y )));
 				float temp_output_4_0_g119 = _FlipbooksColumsRows.x;
 				float temp_output_5_0_g119 = _FlipbooksColumsRows.y;
-				float fbtotaltiles246_g119 = min( temp_output_4_0_g119 * temp_output_5_0_g119, ( ( temp_output_4_0_g119 * temp_output_5_0_g119 ) - 0.0 ) + 1 );
-				float fbcolsoffset246_g119 = 1.0f / temp_output_4_0_g119;
-				float fbrowsoffset246_g119 = 1.0f / temp_output_5_0_g119;
-				float fbspeed246_g119 = _TimeParameters.x * 0.0;
-				float2 fbtiling246_g119 = float2(fbcolsoffset246_g119, fbrowsoffset246_g119);
-				float fbcurrenttileindex246_g119 = floor( fmod( fbspeed246_g119 + texCoord75.x, fbtotaltiles246_g119) );
-				fbcurrenttileindex246_g119 += ( fbcurrenttileindex246_g119 < 0) ? fbtotaltiles246_g119 : 0;
-				float fblinearindextox246_g119 = round ( fmod ( fbcurrenttileindex246_g119, temp_output_4_0_g119 ) );
-				float fboffsetx246_g119 = fblinearindextox246_g119 * fbcolsoffset246_g119;
-				float fblinearindextoy246_g119 = round( fmod( ( fbcurrenttileindex246_g119 - fblinearindextox246_g119 ) / temp_output_4_0_g119, temp_output_5_0_g119 ) );
-				fblinearindextoy246_g119 = (int)(temp_output_5_0_g119-1) - fblinearindextoy246_g119;
-				float fboffsety246_g119 = fblinearindextoy246_g119 * fbrowsoffset246_g119;
-				float2 fboffset246_g119 = float2(fboffsetx246_g119, fboffsety246_g119);
-				half2 fbuv246_g119 = UVFlipbookInput194.xy * fbtiling246_g119 + fboffset246_g119;
-				int flipbookFrame246_g119 = ( ( int )fbcurrenttileindex246_g119);
-				float2 temp_output_73_0 = fbuv246_g119;
+				float2 appendResult116_g119 = (float2(temp_output_4_0_g119 , temp_output_5_0_g119));
+				float temp_output_122_0_g119 = ( temp_output_4_0_g119 * temp_output_5_0_g119 );
+				float2 appendResult175_g119 = (float2(temp_output_122_0_g119 , temp_output_5_0_g119));
+				float Columns213_g119 = temp_output_4_0_g119;
+				float Rows212_g119 = temp_output_5_0_g119;
+				float temp_output_133_0_g119 = ( fmod( _TimeParameters.x , ( Columns213_g119 * Rows212_g119 ) ) * 0.0 );
+				float clampResult129_g119 = clamp( texCoord75.x , 1E-05 , ( temp_output_122_0_g119 - 1.0 ) );
+				float temp_output_185_0_g119 = frac( ( ( temp_output_133_0_g119 + ( clampResult129_g119 + 1E-05 ) ) / temp_output_122_0_g119 ) );
+				float2 appendResult186_g119 = (float2(temp_output_185_0_g119 , ( 1.0 - temp_output_185_0_g119 )));
+				float2 temp_output_203_0_g119 = ( ( appendResult206_g119 / appendResult116_g119 ) + ( floor( ( appendResult175_g119 * appendResult186_g119 ) ) / appendResult116_g119 ) );
+				float2 temp_output_73_0 = temp_output_203_0_g119;
 				float2 panner33 = ( 1.0 * _Time.y * _MainAlphaPanning + temp_output_73_0);
 				float4 break2_g120 = ( tex2D( _MainTex, panner33 ) * _MainAlphaChannel );
 				float MainAlpha30 = saturate( ( break2_g120.x + break2_g120.y + break2_g120.z + break2_g120.w ) );
@@ -1224,9 +1222,19 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				texCoord60.xy = IN.ase_texcoord1.xy * float2( 1,1 ) + float2( 0,0 );
 				float temp_output_3_0_g122 = ( texCoord60.w - ( 1.0 - temp_output_55_0 ) );
 				float temp_output_40_0 = ( IN.ase_color.a * temp_output_55_0 * saturate( saturate( ( temp_output_3_0_g122 / fwidth( temp_output_3_0_g122 ) ) ) ) );
+				float4 screenPos = IN.ase_texcoord2;
+				float4 ase_screenPosNorm = screenPos / screenPos.w;
+				ase_screenPosNorm.z = ( UNITY_NEAR_CLIP_VALUE >= 0 ) ? ase_screenPosNorm.z : ase_screenPosNorm.z * 0.5 + 0.5;
+				float screenDepth199 = LinearEyeDepth(SHADERGRAPH_SAMPLE_SCENE_DEPTH( ase_screenPosNorm.xy ),_ZBufferParams);
+				float distanceDepth199 = abs( ( screenDepth199 - LinearEyeDepth( ase_screenPosNorm.z,_ZBufferParams ) ) / ( _SoftFadeFactor ) );
+				#ifdef _USESOFTALPHA_ON
+				float staticSwitch198 = ( temp_output_40_0 * saturate( distanceDepth199 ) );
+				#else
+				float staticSwitch198 = temp_output_40_0;
+				#endif
 				
 
-				surfaceDescription.Alpha = temp_output_40_0;
+				surfaceDescription.Alpha = staticSwitch198;
 				surfaceDescription.AlphaClipThreshold = 0.5;
 
 				#if _ALPHATEST_ON
@@ -1253,8 +1261,11 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			AlphaToMask Off
 
 			HLSLPROGRAM
+
             #define _SURFACE_TYPE_TRANSPARENT 1
-            #define ASE_SRP_VERSION 120108
+            #define ASE_SRP_VERSION 120112
+            #define REQUIRE_DEPTH_TEXTURE 1
+
 
             #pragma multi_compile _ DOTS_INSTANCING_ON
 
@@ -1274,7 +1285,9 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderGraphFunctions.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderPass.hlsl"
 
-			
+			#define ASE_NEEDS_FRAG_COLOR
+			#pragma shader_feature_local _USESOFTALPHA_ON
+
 
 			struct VertexInput
 			{
@@ -1292,6 +1305,7 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float4 ase_color : COLOR;
 				float4 ase_texcoord : TEXCOORD0;
 				float4 ase_texcoord1 : TEXCOORD1;
+				float4 ase_texcoord2 : TEXCOORD2;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
@@ -1301,18 +1315,19 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			float4 _DetailDistortionChannel;
 			float4 _MainTex_ST;
 			float4 _MainTextureChannel;
+			float4 _MainAlphaChannel;
 			float4 _DetailAdditiveChannel;
 			float4 _DetailMultiplyChannel;
 			float4 _AlphaOverride_ST;
 			float4 _AlphaOverrideChannel;
-			float4 _MainAlphaChannel;
 			float2 _MainTexturePanning;
 			float2 _DetailNoisePanning;
+			float2 _MainAlphaPanning;
 			float2 _FlipbooksColumsRows;
 			float2 _AlphaOverridePanning;
-			float2 _MainAlphaPanning;
-			float _DistortionIntensity;
 			float _Desaturate;
+			float _DistortionIntensity;
+			float _SoftFadeFactor;
 			#ifdef ASE_TESSELLATION
 				float _TessPhongStrength;
 				float _TessValue;
@@ -1326,6 +1341,7 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			sampler2D _AlphaOverride;
 			sampler2D _MainTex;
 			sampler2D _DetailNoise;
+			uniform float4 _CameraDepthTexture_TexelSize;
 
 
 			
@@ -1346,6 +1362,10 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				UNITY_TRANSFER_INSTANCE_ID(v, o);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
+				float4 ase_clipPos = TransformObjectToHClip((v.positionOS).xyz);
+				float4 screenPos = ComputeScreenPos(ase_clipPos);
+				o.ase_texcoord2 = screenPos;
+				
 				o.ase_color = v.ase_color;
 				o.ase_texcoord = v.ase_texcoord1;
 				o.ase_texcoord1 = v.ase_texcoord;
@@ -1467,41 +1487,23 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float2 appendResult182 = (float2(0.0 , 0.0));
 				float2 LocalUVOffset184 = ( appendResult176 + appendResult182 );
 				float2 uv_AlphaOverride = IN.ase_texcoord1.xy * _AlphaOverride_ST.xy + _AlphaOverride_ST.zw;
+				float2 break135_g118 = ( LocalUVOffset184 + uv_AlphaOverride );
+				float2 appendResult206_g118 = (float2(frac( break135_g118.x ) , frac( break135_g118.y )));
 				float temp_output_4_0_g118 = _FlipbooksColumsRows.x;
 				float temp_output_5_0_g118 = _FlipbooksColumsRows.y;
+				float2 appendResult116_g118 = (float2(temp_output_4_0_g118 , temp_output_5_0_g118));
+				float temp_output_122_0_g118 = ( temp_output_4_0_g118 * temp_output_5_0_g118 );
+				float2 appendResult175_g118 = (float2(temp_output_122_0_g118 , temp_output_5_0_g118));
+				float Columns213_g118 = temp_output_4_0_g118;
+				float Rows212_g118 = temp_output_5_0_g118;
+				float temp_output_133_0_g118 = ( fmod( _TimeParameters.x , ( Columns213_g118 * Rows212_g118 ) ) * 0.0 );
 				float4 texCoord75 = IN.ase_texcoord;
 				texCoord75.xy = IN.ase_texcoord.xy * float2( 1,1 ) + float2( 0,0 );
-				// *** BEGIN Flipbook UV Animation vars ***
-				// Total tiles of Flipbook Texture
-				float fbtotaltiles246_g118 = min( temp_output_4_0_g118 * temp_output_5_0_g118, ( ( temp_output_4_0_g118 * temp_output_5_0_g118 ) - 0.0 ) + 1 );
-				// Offsets for cols and rows of Flipbook Texture
-				float fbcolsoffset246_g118 = 1.0f / temp_output_4_0_g118;
-				float fbrowsoffset246_g118 = 1.0f / temp_output_5_0_g118;
-				// Speed of animation
-				float fbspeed246_g118 = _TimeParameters.x * 0.0;
-				// UV Tiling (col and row offset)
-				float2 fbtiling246_g118 = float2(fbcolsoffset246_g118, fbrowsoffset246_g118);
-				// UV Offset - calculate current tile linear index, and convert it to (X * coloffset, Y * rowoffset)
-				// Calculate current tile linear index
-				float fbcurrenttileindex246_g118 = floor( fmod( fbspeed246_g118 + texCoord75.x, fbtotaltiles246_g118) );
-				fbcurrenttileindex246_g118 += ( fbcurrenttileindex246_g118 < 0) ? fbtotaltiles246_g118 : 0;
-				// Obtain Offset X coordinate from current tile linear index
-				float fblinearindextox246_g118 = round ( fmod ( fbcurrenttileindex246_g118, temp_output_4_0_g118 ) );
-				// Multiply Offset X by coloffset
-				float fboffsetx246_g118 = fblinearindextox246_g118 * fbcolsoffset246_g118;
-				// Obtain Offset Y coordinate from current tile linear index
-				float fblinearindextoy246_g118 = round( fmod( ( fbcurrenttileindex246_g118 - fblinearindextox246_g118 ) / temp_output_4_0_g118, temp_output_5_0_g118 ) );
-				// Reverse Y to get tiles from Top to Bottom
-				fblinearindextoy246_g118 = (int)(temp_output_5_0_g118-1) - fblinearindextoy246_g118;
-				// Multiply Offset Y by rowoffset
-				float fboffsety246_g118 = fblinearindextoy246_g118 * fbrowsoffset246_g118;
-				// UV Offset
-				float2 fboffset246_g118 = float2(fboffsetx246_g118, fboffsety246_g118);
-				// Flipbook UV
-				half2 fbuv246_g118 = ( LocalUVOffset184 + uv_AlphaOverride ) * fbtiling246_g118 + fboffset246_g118;
-				// *** END Flipbook UV Animation vars ***
-				int flipbookFrame246_g118 = ( ( int )fbcurrenttileindex246_g118);
-				float2 panner44 = ( 1.0 * _Time.y * _AlphaOverridePanning + fbuv246_g118);
+				float clampResult129_g118 = clamp( texCoord75.x , 1E-05 , ( temp_output_122_0_g118 - 1.0 ) );
+				float temp_output_185_0_g118 = frac( ( ( temp_output_133_0_g118 + ( clampResult129_g118 + 1E-05 ) ) / temp_output_122_0_g118 ) );
+				float2 appendResult186_g118 = (float2(temp_output_185_0_g118 , ( 1.0 - temp_output_185_0_g118 )));
+				float2 temp_output_203_0_g118 = ( ( appendResult206_g118 / appendResult116_g118 ) + ( floor( ( appendResult175_g118 * appendResult186_g118 ) ) / appendResult116_g118 ) );
+				float2 panner44 = ( 1.0 * _Time.y * _AlphaOverridePanning + temp_output_203_0_g118);
 				float4 break2_g121 = ( tex2D( _AlphaOverride, panner44 ) * _AlphaOverrideChannel );
 				float AlphaOverride49 = saturate( ( break2_g121.x + break2_g121.y + break2_g121.z + break2_g121.w ) );
 				float2 uv_DetailNoise = IN.ase_texcoord1.xy * _DetailNoise_ST.xy + _DetailNoise_ST.zw;
@@ -1519,24 +1521,21 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float3 DistortionNoise90 = desaturateVar190;
 				float2 uv_MainTex = IN.ase_texcoord1.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 				float3 UVFlipbookInput194 = ( ( DistortionNoise90 * _DistortionIntensity ) + float3( ( LocalUVOffset184 + uv_MainTex ) ,  0.0 ) );
+				float2 break135_g119 = UVFlipbookInput194.xy;
+				float2 appendResult206_g119 = (float2(frac( break135_g119.x ) , frac( break135_g119.y )));
 				float temp_output_4_0_g119 = _FlipbooksColumsRows.x;
 				float temp_output_5_0_g119 = _FlipbooksColumsRows.y;
-				float fbtotaltiles246_g119 = min( temp_output_4_0_g119 * temp_output_5_0_g119, ( ( temp_output_4_0_g119 * temp_output_5_0_g119 ) - 0.0 ) + 1 );
-				float fbcolsoffset246_g119 = 1.0f / temp_output_4_0_g119;
-				float fbrowsoffset246_g119 = 1.0f / temp_output_5_0_g119;
-				float fbspeed246_g119 = _TimeParameters.x * 0.0;
-				float2 fbtiling246_g119 = float2(fbcolsoffset246_g119, fbrowsoffset246_g119);
-				float fbcurrenttileindex246_g119 = floor( fmod( fbspeed246_g119 + texCoord75.x, fbtotaltiles246_g119) );
-				fbcurrenttileindex246_g119 += ( fbcurrenttileindex246_g119 < 0) ? fbtotaltiles246_g119 : 0;
-				float fblinearindextox246_g119 = round ( fmod ( fbcurrenttileindex246_g119, temp_output_4_0_g119 ) );
-				float fboffsetx246_g119 = fblinearindextox246_g119 * fbcolsoffset246_g119;
-				float fblinearindextoy246_g119 = round( fmod( ( fbcurrenttileindex246_g119 - fblinearindextox246_g119 ) / temp_output_4_0_g119, temp_output_5_0_g119 ) );
-				fblinearindextoy246_g119 = (int)(temp_output_5_0_g119-1) - fblinearindextoy246_g119;
-				float fboffsety246_g119 = fblinearindextoy246_g119 * fbrowsoffset246_g119;
-				float2 fboffset246_g119 = float2(fboffsetx246_g119, fboffsety246_g119);
-				half2 fbuv246_g119 = UVFlipbookInput194.xy * fbtiling246_g119 + fboffset246_g119;
-				int flipbookFrame246_g119 = ( ( int )fbcurrenttileindex246_g119);
-				float2 temp_output_73_0 = fbuv246_g119;
+				float2 appendResult116_g119 = (float2(temp_output_4_0_g119 , temp_output_5_0_g119));
+				float temp_output_122_0_g119 = ( temp_output_4_0_g119 * temp_output_5_0_g119 );
+				float2 appendResult175_g119 = (float2(temp_output_122_0_g119 , temp_output_5_0_g119));
+				float Columns213_g119 = temp_output_4_0_g119;
+				float Rows212_g119 = temp_output_5_0_g119;
+				float temp_output_133_0_g119 = ( fmod( _TimeParameters.x , ( Columns213_g119 * Rows212_g119 ) ) * 0.0 );
+				float clampResult129_g119 = clamp( texCoord75.x , 1E-05 , ( temp_output_122_0_g119 - 1.0 ) );
+				float temp_output_185_0_g119 = frac( ( ( temp_output_133_0_g119 + ( clampResult129_g119 + 1E-05 ) ) / temp_output_122_0_g119 ) );
+				float2 appendResult186_g119 = (float2(temp_output_185_0_g119 , ( 1.0 - temp_output_185_0_g119 )));
+				float2 temp_output_203_0_g119 = ( ( appendResult206_g119 / appendResult116_g119 ) + ( floor( ( appendResult175_g119 * appendResult186_g119 ) ) / appendResult116_g119 ) );
+				float2 temp_output_73_0 = temp_output_203_0_g119;
 				float2 panner33 = ( 1.0 * _Time.y * _MainAlphaPanning + temp_output_73_0);
 				float4 break2_g120 = ( tex2D( _MainTex, panner33 ) * _MainAlphaChannel );
 				float MainAlpha30 = saturate( ( break2_g120.x + break2_g120.y + break2_g120.z + break2_g120.w ) );
@@ -1545,9 +1544,19 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				texCoord60.xy = IN.ase_texcoord1.xy * float2( 1,1 ) + float2( 0,0 );
 				float temp_output_3_0_g122 = ( texCoord60.w - ( 1.0 - temp_output_55_0 ) );
 				float temp_output_40_0 = ( IN.ase_color.a * temp_output_55_0 * saturate( saturate( ( temp_output_3_0_g122 / fwidth( temp_output_3_0_g122 ) ) ) ) );
+				float4 screenPos = IN.ase_texcoord2;
+				float4 ase_screenPosNorm = screenPos / screenPos.w;
+				ase_screenPosNorm.z = ( UNITY_NEAR_CLIP_VALUE >= 0 ) ? ase_screenPosNorm.z : ase_screenPosNorm.z * 0.5 + 0.5;
+				float screenDepth199 = LinearEyeDepth(SHADERGRAPH_SAMPLE_SCENE_DEPTH( ase_screenPosNorm.xy ),_ZBufferParams);
+				float distanceDepth199 = abs( ( screenDepth199 - LinearEyeDepth( ase_screenPosNorm.z,_ZBufferParams ) ) / ( _SoftFadeFactor ) );
+				#ifdef _USESOFTALPHA_ON
+				float staticSwitch198 = ( temp_output_40_0 * saturate( distanceDepth199 ) );
+				#else
+				float staticSwitch198 = temp_output_40_0;
+				#endif
 				
 
-				surfaceDescription.Alpha = temp_output_40_0;
+				surfaceDescription.Alpha = staticSwitch198;
 				surfaceDescription.AlphaClipThreshold = 0.5;
 
 				#if _ALPHATEST_ON
@@ -1578,11 +1587,12 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			ZWrite On
 
 			HLSLPROGRAM
-            #pragma multi_compile_instancing
-            #define _SURFACE_TYPE_TRANSPARENT 1
-            #define ASE_SRP_VERSION 120108
 
-            #pragma multi_compile _ DOTS_INSTANCING_ON
+			#pragma multi_compile_instancing
+			#define _SURFACE_TYPE_TRANSPARENT 1
+			#define ASE_SRP_VERSION 120112
+			#define REQUIRE_DEPTH_TEXTURE 1
+
 
 			#pragma vertex vert
 			#pragma fragment frag
@@ -1601,7 +1611,9 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderGraphFunctions.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderPass.hlsl"
 
-			
+			#define ASE_NEEDS_FRAG_COLOR
+			#pragma shader_feature_local _USESOFTALPHA_ON
+
 
 			struct VertexInput
 			{
@@ -1620,6 +1632,7 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float4 ase_color : COLOR;
 				float4 ase_texcoord1 : TEXCOORD1;
 				float4 ase_texcoord2 : TEXCOORD2;
+				float4 ase_texcoord3 : TEXCOORD3;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
@@ -1629,18 +1642,19 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			float4 _DetailDistortionChannel;
 			float4 _MainTex_ST;
 			float4 _MainTextureChannel;
+			float4 _MainAlphaChannel;
 			float4 _DetailAdditiveChannel;
 			float4 _DetailMultiplyChannel;
 			float4 _AlphaOverride_ST;
 			float4 _AlphaOverrideChannel;
-			float4 _MainAlphaChannel;
 			float2 _MainTexturePanning;
 			float2 _DetailNoisePanning;
+			float2 _MainAlphaPanning;
 			float2 _FlipbooksColumsRows;
 			float2 _AlphaOverridePanning;
-			float2 _MainAlphaPanning;
-			float _DistortionIntensity;
 			float _Desaturate;
+			float _DistortionIntensity;
+			float _SoftFadeFactor;
 			#ifdef ASE_TESSELLATION
 				float _TessPhongStrength;
 				float _TessValue;
@@ -1654,6 +1668,7 @@ Shader "Piloto Studio/Alpha Uber Shader"
 			sampler2D _AlphaOverride;
 			sampler2D _MainTex;
 			sampler2D _DetailNoise;
+			uniform float4 _CameraDepthTexture_TexelSize;
 
 
 			
@@ -1672,6 +1687,10 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				UNITY_TRANSFER_INSTANCE_ID(v, o);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
+				float4 ase_clipPos = TransformObjectToHClip((v.positionOS).xyz);
+				float4 screenPos = ComputeScreenPos(ase_clipPos);
+				o.ase_texcoord3 = screenPos;
+				
 				o.ase_color = v.ase_color;
 				o.ase_texcoord1 = v.ase_texcoord1;
 				o.ase_texcoord2 = v.ase_texcoord;
@@ -1797,41 +1816,23 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float2 appendResult182 = (float2(0.0 , 0.0));
 				float2 LocalUVOffset184 = ( appendResult176 + appendResult182 );
 				float2 uv_AlphaOverride = IN.ase_texcoord2.xy * _AlphaOverride_ST.xy + _AlphaOverride_ST.zw;
+				float2 break135_g118 = ( LocalUVOffset184 + uv_AlphaOverride );
+				float2 appendResult206_g118 = (float2(frac( break135_g118.x ) , frac( break135_g118.y )));
 				float temp_output_4_0_g118 = _FlipbooksColumsRows.x;
 				float temp_output_5_0_g118 = _FlipbooksColumsRows.y;
+				float2 appendResult116_g118 = (float2(temp_output_4_0_g118 , temp_output_5_0_g118));
+				float temp_output_122_0_g118 = ( temp_output_4_0_g118 * temp_output_5_0_g118 );
+				float2 appendResult175_g118 = (float2(temp_output_122_0_g118 , temp_output_5_0_g118));
+				float Columns213_g118 = temp_output_4_0_g118;
+				float Rows212_g118 = temp_output_5_0_g118;
+				float temp_output_133_0_g118 = ( fmod( _TimeParameters.x , ( Columns213_g118 * Rows212_g118 ) ) * 0.0 );
 				float4 texCoord75 = IN.ase_texcoord1;
 				texCoord75.xy = IN.ase_texcoord1.xy * float2( 1,1 ) + float2( 0,0 );
-				// *** BEGIN Flipbook UV Animation vars ***
-				// Total tiles of Flipbook Texture
-				float fbtotaltiles246_g118 = min( temp_output_4_0_g118 * temp_output_5_0_g118, ( ( temp_output_4_0_g118 * temp_output_5_0_g118 ) - 0.0 ) + 1 );
-				// Offsets for cols and rows of Flipbook Texture
-				float fbcolsoffset246_g118 = 1.0f / temp_output_4_0_g118;
-				float fbrowsoffset246_g118 = 1.0f / temp_output_5_0_g118;
-				// Speed of animation
-				float fbspeed246_g118 = _TimeParameters.x * 0.0;
-				// UV Tiling (col and row offset)
-				float2 fbtiling246_g118 = float2(fbcolsoffset246_g118, fbrowsoffset246_g118);
-				// UV Offset - calculate current tile linear index, and convert it to (X * coloffset, Y * rowoffset)
-				// Calculate current tile linear index
-				float fbcurrenttileindex246_g118 = floor( fmod( fbspeed246_g118 + texCoord75.x, fbtotaltiles246_g118) );
-				fbcurrenttileindex246_g118 += ( fbcurrenttileindex246_g118 < 0) ? fbtotaltiles246_g118 : 0;
-				// Obtain Offset X coordinate from current tile linear index
-				float fblinearindextox246_g118 = round ( fmod ( fbcurrenttileindex246_g118, temp_output_4_0_g118 ) );
-				// Multiply Offset X by coloffset
-				float fboffsetx246_g118 = fblinearindextox246_g118 * fbcolsoffset246_g118;
-				// Obtain Offset Y coordinate from current tile linear index
-				float fblinearindextoy246_g118 = round( fmod( ( fbcurrenttileindex246_g118 - fblinearindextox246_g118 ) / temp_output_4_0_g118, temp_output_5_0_g118 ) );
-				// Reverse Y to get tiles from Top to Bottom
-				fblinearindextoy246_g118 = (int)(temp_output_5_0_g118-1) - fblinearindextoy246_g118;
-				// Multiply Offset Y by rowoffset
-				float fboffsety246_g118 = fblinearindextoy246_g118 * fbrowsoffset246_g118;
-				// UV Offset
-				float2 fboffset246_g118 = float2(fboffsetx246_g118, fboffsety246_g118);
-				// Flipbook UV
-				half2 fbuv246_g118 = ( LocalUVOffset184 + uv_AlphaOverride ) * fbtiling246_g118 + fboffset246_g118;
-				// *** END Flipbook UV Animation vars ***
-				int flipbookFrame246_g118 = ( ( int )fbcurrenttileindex246_g118);
-				float2 panner44 = ( 1.0 * _Time.y * _AlphaOverridePanning + fbuv246_g118);
+				float clampResult129_g118 = clamp( texCoord75.x , 1E-05 , ( temp_output_122_0_g118 - 1.0 ) );
+				float temp_output_185_0_g118 = frac( ( ( temp_output_133_0_g118 + ( clampResult129_g118 + 1E-05 ) ) / temp_output_122_0_g118 ) );
+				float2 appendResult186_g118 = (float2(temp_output_185_0_g118 , ( 1.0 - temp_output_185_0_g118 )));
+				float2 temp_output_203_0_g118 = ( ( appendResult206_g118 / appendResult116_g118 ) + ( floor( ( appendResult175_g118 * appendResult186_g118 ) ) / appendResult116_g118 ) );
+				float2 panner44 = ( 1.0 * _Time.y * _AlphaOverridePanning + temp_output_203_0_g118);
 				float4 break2_g121 = ( tex2D( _AlphaOverride, panner44 ) * _AlphaOverrideChannel );
 				float AlphaOverride49 = saturate( ( break2_g121.x + break2_g121.y + break2_g121.z + break2_g121.w ) );
 				float2 uv_DetailNoise = IN.ase_texcoord2.xy * _DetailNoise_ST.xy + _DetailNoise_ST.zw;
@@ -1849,24 +1850,21 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				float3 DistortionNoise90 = desaturateVar190;
 				float2 uv_MainTex = IN.ase_texcoord2.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 				float3 UVFlipbookInput194 = ( ( DistortionNoise90 * _DistortionIntensity ) + float3( ( LocalUVOffset184 + uv_MainTex ) ,  0.0 ) );
+				float2 break135_g119 = UVFlipbookInput194.xy;
+				float2 appendResult206_g119 = (float2(frac( break135_g119.x ) , frac( break135_g119.y )));
 				float temp_output_4_0_g119 = _FlipbooksColumsRows.x;
 				float temp_output_5_0_g119 = _FlipbooksColumsRows.y;
-				float fbtotaltiles246_g119 = min( temp_output_4_0_g119 * temp_output_5_0_g119, ( ( temp_output_4_0_g119 * temp_output_5_0_g119 ) - 0.0 ) + 1 );
-				float fbcolsoffset246_g119 = 1.0f / temp_output_4_0_g119;
-				float fbrowsoffset246_g119 = 1.0f / temp_output_5_0_g119;
-				float fbspeed246_g119 = _TimeParameters.x * 0.0;
-				float2 fbtiling246_g119 = float2(fbcolsoffset246_g119, fbrowsoffset246_g119);
-				float fbcurrenttileindex246_g119 = floor( fmod( fbspeed246_g119 + texCoord75.x, fbtotaltiles246_g119) );
-				fbcurrenttileindex246_g119 += ( fbcurrenttileindex246_g119 < 0) ? fbtotaltiles246_g119 : 0;
-				float fblinearindextox246_g119 = round ( fmod ( fbcurrenttileindex246_g119, temp_output_4_0_g119 ) );
-				float fboffsetx246_g119 = fblinearindextox246_g119 * fbcolsoffset246_g119;
-				float fblinearindextoy246_g119 = round( fmod( ( fbcurrenttileindex246_g119 - fblinearindextox246_g119 ) / temp_output_4_0_g119, temp_output_5_0_g119 ) );
-				fblinearindextoy246_g119 = (int)(temp_output_5_0_g119-1) - fblinearindextoy246_g119;
-				float fboffsety246_g119 = fblinearindextoy246_g119 * fbrowsoffset246_g119;
-				float2 fboffset246_g119 = float2(fboffsetx246_g119, fboffsety246_g119);
-				half2 fbuv246_g119 = UVFlipbookInput194.xy * fbtiling246_g119 + fboffset246_g119;
-				int flipbookFrame246_g119 = ( ( int )fbcurrenttileindex246_g119);
-				float2 temp_output_73_0 = fbuv246_g119;
+				float2 appendResult116_g119 = (float2(temp_output_4_0_g119 , temp_output_5_0_g119));
+				float temp_output_122_0_g119 = ( temp_output_4_0_g119 * temp_output_5_0_g119 );
+				float2 appendResult175_g119 = (float2(temp_output_122_0_g119 , temp_output_5_0_g119));
+				float Columns213_g119 = temp_output_4_0_g119;
+				float Rows212_g119 = temp_output_5_0_g119;
+				float temp_output_133_0_g119 = ( fmod( _TimeParameters.x , ( Columns213_g119 * Rows212_g119 ) ) * 0.0 );
+				float clampResult129_g119 = clamp( texCoord75.x , 1E-05 , ( temp_output_122_0_g119 - 1.0 ) );
+				float temp_output_185_0_g119 = frac( ( ( temp_output_133_0_g119 + ( clampResult129_g119 + 1E-05 ) ) / temp_output_122_0_g119 ) );
+				float2 appendResult186_g119 = (float2(temp_output_185_0_g119 , ( 1.0 - temp_output_185_0_g119 )));
+				float2 temp_output_203_0_g119 = ( ( appendResult206_g119 / appendResult116_g119 ) + ( floor( ( appendResult175_g119 * appendResult186_g119 ) ) / appendResult116_g119 ) );
+				float2 temp_output_73_0 = temp_output_203_0_g119;
 				float2 panner33 = ( 1.0 * _Time.y * _MainAlphaPanning + temp_output_73_0);
 				float4 break2_g120 = ( tex2D( _MainTex, panner33 ) * _MainAlphaChannel );
 				float MainAlpha30 = saturate( ( break2_g120.x + break2_g120.y + break2_g120.z + break2_g120.w ) );
@@ -1875,9 +1873,19 @@ Shader "Piloto Studio/Alpha Uber Shader"
 				texCoord60.xy = IN.ase_texcoord2.xy * float2( 1,1 ) + float2( 0,0 );
 				float temp_output_3_0_g122 = ( texCoord60.w - ( 1.0 - temp_output_55_0 ) );
 				float temp_output_40_0 = ( IN.ase_color.a * temp_output_55_0 * saturate( saturate( ( temp_output_3_0_g122 / fwidth( temp_output_3_0_g122 ) ) ) ) );
+				float4 screenPos = IN.ase_texcoord3;
+				float4 ase_screenPosNorm = screenPos / screenPos.w;
+				ase_screenPosNorm.z = ( UNITY_NEAR_CLIP_VALUE >= 0 ) ? ase_screenPosNorm.z : ase_screenPosNorm.z * 0.5 + 0.5;
+				float screenDepth199 = LinearEyeDepth(SHADERGRAPH_SAMPLE_SCENE_DEPTH( ase_screenPosNorm.xy ),_ZBufferParams);
+				float distanceDepth199 = abs( ( screenDepth199 - LinearEyeDepth( ase_screenPosNorm.z,_ZBufferParams ) ) / ( _SoftFadeFactor ) );
+				#ifdef _USESOFTALPHA_ON
+				float staticSwitch198 = ( temp_output_40_0 * saturate( distanceDepth199 ) );
+				#else
+				float staticSwitch198 = temp_output_40_0;
+				#endif
 				
 
-				surfaceDescription.Alpha = temp_output_40_0;
+				surfaceDescription.Alpha = staticSwitch198;
 				surfaceDescription.AlphaClipThreshold = 0.5;
 
 				#if _ALPHATEST_ON
@@ -1905,7 +1913,7 @@ Shader "Piloto Studio/Alpha Uber Shader"
 	Fallback Off
 }
 /*ASEBEGIN
-Version=19403
+Version=19302
 Node;AmplifyShaderEditor.CommentaryNode;103;-853.4689,-2259.997;Inherit;False;1884.647;1001.187;Extra Noise Setup;22;91;191;155;156;87;157;85;90;190;158;79;83;80;84;81;92;189;86;105;162;108;106;;1,1,1,1;0;0
 Node;AmplifyShaderEditor.TexturePropertyNode;83;-814.2831,-2017.479;Inherit;True;Property;_DetailNoise;Detail Noise;10;0;Create;True;0;0;0;False;0;False;None;None;False;white;Auto;Texture2D;-1;0;2;SAMPLER2D;0;SAMPLERSTATE;1
 Node;AmplifyShaderEditor.TextureCoordinatesNode;81;-564.8421,-1844.278;Inherit;False;0;-1;2;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT2;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
@@ -1941,9 +1949,9 @@ Node;AmplifyShaderEditor.SimpleAddOpNode;188;-2400.768,-2413.259;Inherit;False;2
 Node;AmplifyShaderEditor.GetLocalVarNode;195;-2524.121,-1448.583;Inherit;False;194;UVFlipbookInput;1;0;OBJECT;;False;1;FLOAT3;0
 Node;AmplifyShaderEditor.TextureCoordinatesNode;75;-2512.07,-1982.654;Inherit;False;1;-1;4;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT4;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.Vector2Node;74;-2538.623,-1820.153;Inherit;False;Property;_FlipbooksColumsRows;Flipbooks Colums & Rows;9;0;Create;True;0;0;0;False;0;False;1,1;1,1;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
-Node;AmplifyShaderEditor.FunctionNode;177;-2274.88,-2413.233;Inherit;False;Flipbook;-1;;118;53c2488c220f6564ca6c90721ee16673;3,68,0,217,0,244,0;11;51;SAMPLER2D;0.0;False;167;SAMPLERSTATE;0;False;13;FLOAT2;0,0;False;24;FLOAT;0;False;210;FLOAT;4;False;4;FLOAT;3;False;5;FLOAT;3;False;130;FLOAT;0;False;2;FLOAT;0;False;55;FLOAT;0;False;70;FLOAT;0;False;5;COLOR;53;FLOAT2;0;FLOAT;47;FLOAT;48;INT;218
+Node;AmplifyShaderEditor.FunctionNode;177;-2274.88,-2413.233;Inherit;False;Flipbook;-1;;118;53c2488c220f6564ca6c90721ee16673;3,68,0,217,0,244,0;11;51;SAMPLER2D;0.0;False;167;SAMPLERSTATE;0;False;13;FLOAT2;0,0;False;24;FLOAT;0;False;210;FLOAT;4;False;4;FLOAT;3;False;5;FLOAT;3;False;130;FLOAT;0;False;2;FLOAT;0;False;55;FLOAT;0;False;70;FLOAT;0;False;5;COLOR;53;FLOAT2;0;FLOAT;47;FLOAT;48;FLOAT;218
 Node;AmplifyShaderEditor.Vector2Node;51;-2289.648,-2177.604;Inherit;False;Property;_AlphaOverridePanning;Alpha Override Panning;7;0;Create;True;0;0;0;False;0;False;0,0;0,0;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
-Node;AmplifyShaderEditor.FunctionNode;73;-2289.329,-1441.295;Inherit;False;Flipbook;-1;;119;53c2488c220f6564ca6c90721ee16673;3,68,0,217,0,244,0;11;51;SAMPLER2D;0.0;False;167;SAMPLERSTATE;0;False;13;FLOAT2;0,0;False;24;FLOAT;0;False;210;FLOAT;4;False;4;FLOAT;3;False;5;FLOAT;3;False;130;FLOAT;0;False;2;FLOAT;0;False;55;FLOAT;0;False;70;FLOAT;0;False;5;COLOR;53;FLOAT2;0;FLOAT;47;FLOAT;48;INT;218
+Node;AmplifyShaderEditor.FunctionNode;73;-2289.329,-1441.295;Inherit;False;Flipbook;-1;;119;53c2488c220f6564ca6c90721ee16673;3,68,0,217,0,244,0;11;51;SAMPLER2D;0.0;False;167;SAMPLERSTATE;0;False;13;FLOAT2;0,0;False;24;FLOAT;0;False;210;FLOAT;4;False;4;FLOAT;3;False;5;FLOAT;3;False;130;FLOAT;0;False;2;FLOAT;0;False;55;FLOAT;0;False;70;FLOAT;0;False;5;COLOR;53;FLOAT2;0;FLOAT;47;FLOAT;48;FLOAT;218
 Node;AmplifyShaderEditor.Vector2Node;32;-1965.995,-1302.504;Inherit;False;Property;_MainAlphaPanning;Main Alpha Panning;5;0;Create;True;0;0;0;False;0;False;0,0;0,0;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
 Node;AmplifyShaderEditor.PannerNode;44;-2000.767,-2381.259;Inherit;False;3;0;FLOAT2;0,0;False;2;FLOAT2;0,0;False;1;FLOAT;1;False;1;FLOAT2;0
 Node;AmplifyShaderEditor.PannerNode;33;-1965.995,-1414.504;Inherit;False;3;0;FLOAT2;0,0;False;2;FLOAT2;0,0;False;1;FLOAT;1;False;1;FLOAT2;0
@@ -1961,11 +1969,11 @@ Node;AmplifyShaderEditor.GetLocalVarNode;53;-186.5113,-450.0185;Inherit;False;30
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;55;5.488959,-546.0185;Inherit;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
 Node;AmplifyShaderEditor.OneMinusNode;64;188.3074,-430.0071;Inherit;False;1;0;FLOAT;0;False;1;FLOAT;0
 Node;AmplifyShaderEditor.TextureCoordinatesNode;60;127.5556,-355.1935;Inherit;False;0;-1;4;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT4;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.RangedFloatNode;202;153.5714,-84.502;Inherit;False;Property;_SoftFadeFactor;SoftFadeFactor;17;0;Create;True;0;0;0;False;0;False;0;0;0.1;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.FunctionNode;70;365.1349,-362.5852;Inherit;False;Step Antialiasing;-1;;122;2a825e80dfb3290468194f83380797bd;0;2;1;FLOAT;0;False;2;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.DepthFade;199;436.5714,-155.502;Inherit;False;True;False;True;2;1;FLOAT3;0,0,0;False;0;FLOAT;1;False;1;FLOAT;0
 Node;AmplifyShaderEditor.VertexColorNode;61;708.7333,-566.5916;Inherit;False;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.SaturateNode;68;545.5906,-363.4737;Inherit;False;1;0;FLOAT;0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;202;153.5714,-84.502;Inherit;False;Property;_SoftFadeFactor;SoftFadeFactor;17;0;Create;True;0;0;0;False;0;False;0;0;0.1;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.DepthFade;199;436.5714,-155.502;Inherit;False;True;False;True;2;1;FLOAT3;0,0,0;False;0;FLOAT;1;False;1;FLOAT;0
 Node;AmplifyShaderEditor.SaturateNode;203;692.5714,-160.502;Inherit;False;1;0;FLOAT;0;False;1;FLOAT;0
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;40;730.5135,-407.2835;Inherit;False;3;3;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0;False;1;FLOAT;0
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;201;914.9233,-360.6032;Inherit;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
@@ -2002,7 +2010,7 @@ Node;AmplifyShaderEditor.DesaturateOpNode;166;73.56007,-1012.246;Inherit;False;2
 Node;AmplifyShaderEditor.TextureCoordinatesNode;71;521.1351,-885.5583;Inherit;False;0;-1;4;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT4;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.RangedFloatNode;167;14.5006,-924.7495;Inherit;False;Property;_Desaturate;Desaturate?;1;0;Create;True;0;0;0;False;0;False;0;0;0;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;205;1346.249,-1045.851;Float;False;False;-1;2;UnityEditor.ShaderGraphUnlitGUI;0;1;New Amplify Shader;2992e84f91cbeb14eab234972e07ea9d;True;ExtraPrePass;0;0;ExtraPrePass;5;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;False;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;False;False;False;True;4;RenderPipeline=UniversalPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;UniversalMaterialType=Unlit;True;3;True;12;all;0;False;True;1;1;False;;0;False;;0;1;False;;0;False;;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;True;True;True;True;0;False;;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;True;True;0;False;;0;False;;True;0;False;False;0;;0;0;Standard;0;False;0
-Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;206;1346.249,-1045.851;Float;False;True;-1;2;UnityEditor.ShaderGraphUnlitGUI;0;13;Piloto Studio/Alpha Uber Shader;2992e84f91cbeb14eab234972e07ea9d;True;Forward;0;1;Forward;8;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;False;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;False;False;False;True;4;RenderPipeline=UniversalPipeline;RenderType=Transparent=RenderType;Queue=Transparent=Queue=0;UniversalMaterialType=Unlit;True;7;True;12;all;0;False;True;1;5;False;;10;False;;1;1;False;;10;False;;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;True;True;True;True;0;False;;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;2;False;;True;3;False;;True;True;0;False;;0;False;;True;1;LightMode=UniversalForwardOnly;False;False;0;;0;0;Standard;22;Surface;1;638227594256591002;  Blend;0;0;Two Sided;1;0;Forward Only;0;0;Cast Shadows;0;638227594294084865;  Use Shadow Threshold;0;0;Receive Shadows;1;0;GPU Instancing;1;0;LOD CrossFade;0;0;Built-in Fog;0;0;Meta Pass;0;0;Extra Pre Pass;0;0;Tessellation;0;0;  Phong;0;0;  Strength;0.5,False,;0;  Type;0;0;  Tess;16,False,;0;  Min;10,False,;0;  Max;25,False,;0;  Edge Length;16,False,;0;  Max Displacement;25,False,;0;Vertex Position,InvertActionOnDeselection;1;0;0;10;False;True;False;True;False;False;True;True;True;False;False;;False;0
+Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;206;1346.249,-1045.851;Float;False;True;-1;2;UnityEditor.ShaderGraphUnlitGUI;0;13;Piloto Studio/Alpha Uber Shader;2992e84f91cbeb14eab234972e07ea9d;True;Forward;0;1;Forward;8;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;False;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;False;False;False;True;4;RenderPipeline=UniversalPipeline;RenderType=Transparent=RenderType;Queue=Transparent=Queue=0;UniversalMaterialType=Unlit;True;7;True;12;all;0;False;True;1;5;False;;10;False;;1;1;False;;10;False;;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;True;True;True;True;0;False;;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;2;False;;True;3;False;;True;True;0;False;;0;False;;True;1;LightMode=UniversalForwardOnly;False;False;0;;0;0;Standard;21;Surface;1;638227594256591002;  Blend;0;0;Two Sided;1;0;Forward Only;0;0;Cast Shadows;0;638227594294084865;  Use Shadow Threshold;0;0;GPU Instancing;1;0;LOD CrossFade;0;0;Built-in Fog;0;0;Meta Pass;0;0;Extra Pre Pass;0;0;Tessellation;0;0;  Phong;0;0;  Strength;0.5,False,;0;  Type;0;0;  Tess;16,False,;0;  Min;10,False,;0;  Max;25,False,;0;  Edge Length;16,False,;0;  Max Displacement;25,False,;0;Vertex Position,InvertActionOnDeselection;1;0;0;10;False;True;False;True;False;False;True;True;True;False;False;;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;207;1346.249,-1045.851;Float;False;False;-1;2;UnityEditor.ShaderGraphUnlitGUI;0;1;New Amplify Shader;2992e84f91cbeb14eab234972e07ea9d;True;ShadowCaster;0;2;ShadowCaster;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;False;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;False;False;False;True;4;RenderPipeline=UniversalPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;UniversalMaterialType=Unlit;True;3;True;12;all;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;False;False;True;False;False;False;False;0;False;;False;False;False;False;False;False;False;False;False;True;1;False;;True;3;False;;False;True;1;LightMode=ShadowCaster;False;False;0;;0;0;Standard;0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;208;1346.249,-1045.851;Float;False;False;-1;2;UnityEditor.ShaderGraphUnlitGUI;0;1;New Amplify Shader;2992e84f91cbeb14eab234972e07ea9d;True;DepthOnly;0;3;DepthOnly;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;False;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;False;False;False;True;4;RenderPipeline=UniversalPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;UniversalMaterialType=Unlit;True;3;True;12;all;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;False;False;True;False;False;False;False;0;False;;False;False;False;False;False;False;False;False;False;True;1;False;;False;False;True;1;LightMode=DepthOnly;False;False;0;;0;0;Standard;0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;209;1346.249,-1045.851;Float;False;False;-1;2;UnityEditor.ShaderGraphUnlitGUI;0;1;New Amplify Shader;2992e84f91cbeb14eab234972e07ea9d;True;Meta;0;4;Meta;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;False;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;False;False;False;True;4;RenderPipeline=UniversalPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;UniversalMaterialType=Unlit;True;3;True;12;all;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;2;False;;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;1;LightMode=Meta;False;False;0;;0;0;Standard;0;False;0
@@ -2062,8 +2070,8 @@ WireConnection;55;1;53;0
 WireConnection;64;0;55;0
 WireConnection;70;1;64;0
 WireConnection;70;2;60;4
-WireConnection;68;0;70;0
 WireConnection;199;0;202;0
+WireConnection;68;0;70;0
 WireConnection;203;0;199;0
 WireConnection;40;0;61;4
 WireConnection;40;1;55;0
@@ -2110,6 +2118,6 @@ WireConnection;22;2;23;0
 WireConnection;166;0;36;0
 WireConnection;166;1;167;0
 WireConnection;206;2;39;0
-WireConnection;206;3;40;0
+WireConnection;206;3;198;0
 ASEEND*/
-//CHKSM=8C3B4BDFE838DFDBC82B77FDCC70CC6AD394D944
+//CHKSM=F4D0D03100CED294319898DC3E943C53172EA4FF
