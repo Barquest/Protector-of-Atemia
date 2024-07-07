@@ -17,9 +17,31 @@ MonoBehaviour:
   levelDescription: Ambush
   itemDrops:
   - {fileID: 0}
-  itemDropsPerfect: []
+  itemDropsBronze: []
+  itemDropsSilver: []
+  itemDropsGold: []
+  enemies: []
+  objectives:
+  - name: 
+    objective: 0
+    curPoint: 0
+    maxPoint: 0
+    isIncremental: 0
+    isCompleted: 0
+  - name: 
+    objective: 0
+    curPoint: 0
+    maxPoint: 0
+    isIncremental: 0
+    isCompleted: 0
+  - name: 
+    objective: 0
+    curPoint: 0
+    maxPoint: 0
+    isIncremental: 0
+    isCompleted: 0
   dialogue: {fileID: 0}
   stageData: {fileID: 11400000, guid: 3f6fd621c6d48fc429d07fbc98e2dfad, type: 2}
   isUnlocked: 0
-  levelUnlockReward: Level 4
+  levelUnlockReward: []
   goldPool: 2000
