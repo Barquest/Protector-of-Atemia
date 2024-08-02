@@ -738,9 +738,9 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: JSONSerializationFileSave
+    Android: 
     PS4: 
-    Standalone: 
+    Standalone: JSONSerializationFileSave
     WebGL: 
     Windows Store Apps: 
     XboxOne: 

@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: SaveSettingsData
   m_EditorClassIdentifier: 
   saveMethod: 00000000
-  buildTargetGroup: 07000000
+  buildTargetGroup: 01000000
