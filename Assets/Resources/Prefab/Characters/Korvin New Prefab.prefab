@@ -92,10 +92,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -3418718139891169728, guid: f2d68058164e526468b2d2804be8a12c, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 092ab0d1a7aed8d448b668876a2e18e9, type: 2}
     - target: {fileID: 919132149155446097, guid: f2d68058164e526468b2d2804be8a12c, type: 3}
       propertyPath: m_Name
-      value: Korvin New
+      value: Korvin New Prefab
       objectReference: {fileID: 0}
+    - target: {fileID: 6969604258866019623, guid: f2d68058164e526468b2d2804be8a12c, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: dff8aa41fe356524c939dc204d3c289e, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -117,6 +125,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7687166775837969945}
     m_Modifications:
+    - target: {fileID: 6970257472197407188, guid: 62922d1ba6a38e048b5863bd3d2a2caa, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 35a3c43265947614b9d838e8c6864328, type: 2}
     - target: {fileID: 8138137434476595899, guid: 62922d1ba6a38e048b5863bd3d2a2caa, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.011080324
